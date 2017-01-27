@@ -1,3 +1,1 @@
-<p>
-  host-screen works!
-</p>
+<button (click)="toggleGame($event)">{{(in_progress | async)?.$value == true ? "Stop" : "Start" }} Game</button>

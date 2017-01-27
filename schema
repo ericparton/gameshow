@@ -1,0 +1,20 @@
+users	
+	$uid	
+		name: string
+
+hosts
+	$uid
+		true
+
+submissions
+	$uid
+		submitted_on: $timestamp
+
+answers
+	$uid	
+		correct: boolean
+		question: $timestamp
+
+questions
+	$timestamp
+		value: number
