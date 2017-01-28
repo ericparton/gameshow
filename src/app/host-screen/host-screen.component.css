@@ -23,3 +23,12 @@ td {
 .table-btn div label {
     width: 50%;
 }
+
+hr {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.submit {
+    margin-top: 10px;
+}

@@ -12,6 +12,9 @@ export class HostScreenComponent implements OnInit {
     public questions: FirebaseListObservable<any[]>;
     public users: FirebaseObjectObservable<any>;
 
+    public valueModel: number;
+    public radioModel: string = 'correct';
+
     constructor(private af: AngularFire) {
         this.users = af.database.object('/users');
 
@@ -35,15 +38,21 @@ export class HostScreenComponent implements OnInit {
     ngOnInit() {
     }
 
-    toggleGame(event: MouseEvent) {
-        // this.in_progress.set(event.srcElement.innerHTML.startsWith("Start"));
-    }
-
     getUser(users: any, uid: string): any {
         if (users) {
             return users[uid];
         }
 
         return null
+    }
+
+    onNewQuestionSubmit() {
+        let now: Date = new Date();
+
+        this.af.database.object(`/questions/${now.getTime()}`).set({
+            value: this.valueModel
+        });
+
+        this.valueModel = null;
     }
 }

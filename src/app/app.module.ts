@@ -4,6 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 import {RouterModule, Routes} from '@angular/router';
+import { ButtonsModule } from 'ng2-bootstrap';
 
 import {AppComponent} from './app.component';
 import {HostScreenComponent} from './host-screen/host-screen.component';
@@ -48,6 +49,7 @@ const myFirebaseAuthConfig = {
         BrowserModule,
         FormsModule,
         HttpModule,
+        ButtonsModule,
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
         RouterModule.forRoot(appRoutes, {useHash: true})
     ],

@@ -1,3 +1,16 @@
+<div class="container-fluid">
+    <h2>New Question</h2>
+    <form (ngSubmit)="onNewQuestionSubmit()">
+        <div class="form-group">
+            <label for="newValue">Value:</label>
+            <input class="form-control" id="newValue" type="number"
+                   placeholder="Enter question value in dollars here"
+                   [(ngModel)]="valueModel" required [ngModelOptions]="{standalone: true}">
+            <button class="btn btn-primary submit" type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+<hr />
 <div *ngFor="let question of questions | async" class="container-fluid">
     <h2>Latest Question</h2>
     <div class="form-group">
@@ -8,35 +21,37 @@
         <label for="asked">Asked:</label>
         <span id="asked">{{question.$key | millisecondsDate}}</span>
     </div>
-    <label for="list">Submissions:</label>
-    <div class="table-responsive">
-        <table id="list" class="table table-bordered table-striped">
-            <thead>
+    <div *ngIf="(submissions | async)?.length > 0">
+        <label for="list">Submissions:</label>
+        <div class="table-responsive">
+            <table id="list" class="table table-bordered table-striped">
+                <thead>
                 <tr>
                     <th>#</th>
                     <th>Player</th>
                     <th>Submitted</th>
                     <td class="table-btn"></td>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr *ngFor="let idx = index; let submission of submissions | async">
                     <td>{{idx + 1}}</td>
                     <td>{{ getUser((users | async),submission.$key)?.name }}</td>
                     <td>{{ submission.submitted_on | millisecondsDate }}</td>
                     <td class="table-btn">
                         <div class="btn-group">
-                            <label class="btn btn-success" btnRadio="Left" uncheckable>
-                                <i class="fa fa-check" aria-hidden="true"></i>
+                            <label class="btn btn-primary" [(ngModel)]="radioModel" btnRadio="correct" uncheckable>
+                                <i class="fa fa-check"></i>
                             </label>
-                            <label class="btn btn-danger" btnRadio="Middle" uncheckable>
-                                <i class="fa fa-times" aria-hidden="true"></i>
+                            <label class="btn btn-primary" [(ngModel)]="radioModel" btnRadio="wrong" uncheckable>
+                                <i class="fa fa-times"></i>
                             </label>
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!--<button (click)="toggleGame($event)">{{(in_progress | async)?.$value == true ? "Stop" : "Start" }} Game</button>-->
