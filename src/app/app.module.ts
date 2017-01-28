@@ -6,7 +6,6 @@ import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 import {RouterModule, Routes} from '@angular/router';
 
 import {AppComponent} from './app.component';
-import {WelcomeScreenComponent} from './welcome-screen/welcome-screen.component';
 import {HostScreenComponent} from './host-screen/host-screen.component';
 import {PlayerScreenComponent} from './player-screen/player-screen.component';
 import {ScoreboardScreenComponent} from './scoreboard-screen/scoreboard-screen.component';
@@ -23,8 +22,7 @@ const myFirebaseConfig = {
 };
 
 const appRoutes: Routes = [
-    {path: '', redirectTo: 'welcome', pathMatch: 'full'},
-    {path: 'welcome', component: WelcomeScreenComponent},
+    {path: '', pathMatch: 'full', component: AppComponent},
     {path: 'host', component: HostScreenComponent},
     {path: 'player', component: PlayerScreenComponent}
 ];
@@ -37,7 +35,6 @@ const myFirebaseAuthConfig = {
 @NgModule({
     declarations: [
         AppComponent,
-        WelcomeScreenComponent,
         HostScreenComponent,
         PlayerScreenComponent,
         ScoreboardScreenComponent,

@@ -25,7 +25,9 @@ export class HostScreenComponent implements OnInit {
         this.submissions = af.database.list('/submissions', {
             query: {
                 orderByChild: 'submitted_on',
-                startAt: this.questions.filter(questions => questions.length == 1).map(questions => questions[0].$key)
+                startAt: this.questions
+                    .filter(questions => questions.length == 1)
+                    .map(questions => parseInt(questions[0].$key))
             }
         });
     }

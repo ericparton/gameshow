@@ -31,8 +31,6 @@ export class PlayerScreenComponent implements OnInit {
         });
 
         this.place = Observable.combineLatest([this.submissions, this.af.auth]).map(result => {
-            console.log(result);
-
             let submissionz: any[] = result[0];
             let uid :string = result[1].auth.uid;
 
