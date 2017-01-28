@@ -1,11 +1,15 @@
 <div class="container">
-    <div>
-        <span><h2>{{ name | async }}</h2></span>
-        <!--<span><h2>$400</h2></span>-->
+    <div class="header">
+        <span>
+            <h2 class="name">{{ name | async }}</h2>
+            <h2 class="money">{{ money | async | currency:'USD':true }}</h2>
+        </span>
     </div>
     <div class="btn-container">
-        <button type="button" class="btn btn-primary btn-big">Submit</button>
+        <button type="button" class="btn btn-primary btn-big">
+            <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+        </button>
     </div>
-    <h1 class="text-center" style="flex:none;">{{ place | async | ordinal | uppercase }}</h1>
+    <!--<h2 class="text-center place" style="flex:none;">{{ place | async | ordinal | titlecase }}</h2>-->
 </div>
 

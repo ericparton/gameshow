@@ -13,6 +13,7 @@ export class PlayerScreenComponent implements OnInit {
     public questions: FirebaseListObservable<any[]>;
     public place: Observable<number>;
     public name: Observable<string>;
+    public money: Observable<number>;
 
     constructor(private af: AngularFire) {
         this.questions = af.database.list('/questions', {
@@ -47,9 +48,12 @@ export class PlayerScreenComponent implements OnInit {
         this.name = af.auth
             .map(state => state.auth.uid)
             .flatMap(uid => af.database.object(`/users/${uid}`))
-            .map(user => {
-                return user.name
-            });
+            .map(user => user.name);
+
+        // this.money = af.auth
+        //     .map(state => state.auth.uid)
+        //     .flatMap(uid => af.database.object(`/users/${uid}`))
+        //     .map(user => user.name);
     }
 
     ngOnInit() {

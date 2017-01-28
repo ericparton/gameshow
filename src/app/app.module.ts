@@ -12,6 +12,7 @@ import {ScoreboardScreenComponent} from './scoreboard-screen/scoreboard-screen.c
 // import {WaveComponent} from "ng-spin-kit";
 import {MillisecondDatePipe} from "./date-with-milliseconds.pipe";
 import {OrdinalPipe} from "./ordinal.pipe";
+import {TitleCasePipe} from "./title-case.pipe";
 
 const myFirebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -39,7 +40,8 @@ const myFirebaseAuthConfig = {
         PlayerScreenComponent,
         ScoreboardScreenComponent,
         MillisecondDatePipe,
-        OrdinalPipe
+        OrdinalPipe,
+        TitleCasePipe
         // WaveComponent
     ],
     imports: [

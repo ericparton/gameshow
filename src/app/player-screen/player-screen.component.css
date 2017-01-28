@@ -6,9 +6,34 @@
 
 .btn-container {
     flex: 5;
+    margin-bottom: 15px;
 }
 
 .btn-big {
     width: 100%;
     height: 100%;
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.btn .fa {
+    font-size: 300px;
+}
+
+.header {
+    clear: both;
+}
+
+.name{
+    float:left;
+}
+
+.money{
+    float:right;
+}
+
+.place {
+    margin-top: 10px;
 }
