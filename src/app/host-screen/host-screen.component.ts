@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
+import {AngularFire} from "angularfire2";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'app-host-screen',
@@ -8,9 +9,9 @@ import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "ang
 })
 export class HostScreenComponent implements OnInit {
 
-    public submissions: FirebaseListObservable<any[]>;
-    public questions: FirebaseListObservable<any[]>;
-    public users: FirebaseObjectObservable<any>;
+    public submissions: Observable<any[]>;
+    public questions: Observable<any[]>;
+    public users: Observable<any>;
 
     public valueModel: number;
     public radioModel: string = 'correct';
@@ -25,14 +26,16 @@ export class HostScreenComponent implements OnInit {
             }
         });
 
-        this.submissions = af.database.list('/submissions', {
-            query: {
-                orderByChild: 'submitted_on',
-                startAt: this.questions
-                    .filter(questions => questions.length == 1)
-                    .map(questions => parseInt(questions[0].$key))
-            }
-        });
+        this.submissions = this.questions
+            .filter(questions => questions.length > 0)
+            .map(questions => questions[0].$key)
+            .flatMap(question => {
+                return af.database.list(`/submissions/${question}`, {
+                    query: {
+                        orderByChild: 'submitted_on'
+                    }
+                });
+            });
     }
 
     ngOnInit() {
