@@ -6,9 +6,10 @@
         </span>
     </div>
     <div class="btn-container">
-        <button *ngIf="(place | async)" type="button" (click)="onClick()" class="btn btn-primary btn-big">
-            <i *ngIf="(place | async) < 1" class="fa fa-question-circle-o" aria-hidden="true"></i>
-            <span *ngIf="(place | async) >= 1" class="place">{{ place | async }}</span>
+        <button [disabled]="(place | async) > 0" *ngIf="(place | async)" type="button"
+                (click)="onClick()" class="btn btn-primary btn-big">
+            <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
+            <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
         </button>
     </div>
 </div>
