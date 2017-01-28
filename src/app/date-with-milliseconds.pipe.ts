@@ -4,6 +4,10 @@ import {DatePipe} from "@angular/common";
 @Pipe({name: 'millisecondsDate'})
 export class MillisecondDatePipe implements PipeTransform {
     transform(value: any): string {
+        if(!value){
+            return value;
+        }
+
         let datePipe: DatePipe = new DatePipe('en-US');
         let numValue: number = parseInt(value);
 

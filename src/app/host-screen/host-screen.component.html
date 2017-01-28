@@ -11,17 +11,19 @@
     </form>
 </div>
 <hr />
-<div *ngFor="let question of questions | async" class="container-fluid">
-    <h2>Latest Question</h2>
-    <div class="form-group">
-        <label for="value">Value:</label>
-        <span id="value">{{question.value | currency:"USD":true}}</span>
+<div class="container-fluid">
+    <div *ngIf="question">
+        <h2>Latest Question</h2>
+        <div class="form-group">
+            <label for="value">Value:</label>
+            <span id="value">{{question?.value | currency:"USD":true}}</span>
+        </div>
+        <div class="form-group">
+            <label for="asked">Asked:</label>
+            <span id="asked">{{question?.$key | millisecondsDate}}</span>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="asked">Asked:</label>
-        <span id="asked">{{question.$key | millisecondsDate}}</span>
-    </div>
-    <div *ngIf="(submissions | async)?.length > 0">
+    <div *ngIf="(responses | async)?.length > 0">
         <label for="list">Submissions:</label>
         <div class="table-responsive">
             <table id="list" class="table table-bordered table-striped">
@@ -34,16 +36,20 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let idx = index; let submission of submissions | async">
+                <tr *ngFor="let idx = index; let response of responses | async">
                     <td>{{idx + 1}}</td>
-                    <td>{{ getUser((users | async),submission.$key)?.name }}</td>
-                    <td>{{ submission.submitted_on | millisecondsDate }}</td>
+                    <td>{{ getUser((users | async),response.$key)?.name }}</td>
+                    <td>{{ response.submitted_on | millisecondsDate }}</td>
                     <td class="table-btn">
                         <div class="btn-group">
-                            <label class="btn btn-primary" [(ngModel)]="radioModel" btnRadio="correct" uncheckable>
+                            <label class="btn btn-primary"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event)"
+                                   [(ngModel)]="answerModel[idx]" btnRadio="true" uncheckable>
                                 <i class="fa fa-check"></i>
                             </label>
-                            <label class="btn btn-primary" [(ngModel)]="radioModel" btnRadio="wrong" uncheckable>
+                            <label class="btn btn-primary"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event)"
+                                   [(ngModel)]="answerModel[idx]" btnRadio="false" uncheckable>
                                 <i class="fa fa-times"></i>
                             </label>
                         </div>
