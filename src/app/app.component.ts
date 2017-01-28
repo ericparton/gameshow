@@ -14,13 +14,14 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        //TODO: unscramble this
         this.af.auth.subscribe(state => {
             if (state) {
                 let user: FirebaseObjectObservable<any> = this.af.database.object(`/users/${state.uid}`);
                 user.update({name: state.auth.displayName});
                 user.subscribe(object => {
                     let value = object.name;
-                    if (value != null && this.router.url === '/') {
+                    if (value != null) {
                         let host: FirebaseObjectObservable<any> = this.af.database.object(`/hosts/${state.uid}`);
                         host.subscribe(object => {
                             if (object.$value) {
@@ -34,7 +35,7 @@ export class AppComponent implements OnInit {
                 });
             }
             else {
-                this.router.navigate(['/welcome']);
+                this.af.auth.login();
             }
         })
 
