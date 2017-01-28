@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2";
-import {Observable} from "rxjs";
 
 @Component({
     selector: 'app-host-screen',
@@ -23,14 +22,10 @@ export class HostScreenComponent implements OnInit {
             }
         });
 
-        this.questions.subscribe(questions => {
-            if (questions.length > 0) {
-                this.submissions = af.database.list('/submissions', {
-                    query: {
-                        orderByChild: 'submitted_on',
-                        startAt: parseInt(questions[0].$key)
-                    }
-                });
+        this.submissions = af.database.list('/submissions', {
+            query: {
+                orderByChild: 'submitted_on',
+                startAt: this.questions.filter(questions => questions.length == 1).map(questions => questions[0].$key)
             }
         });
     }
