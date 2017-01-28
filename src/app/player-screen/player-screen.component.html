@@ -1,1 +1,11 @@
-<h1>{{ place | async | ordinal | uppercase }}</h1>
+<div class="container">
+    <div>
+        <span><h2>{{ name | async }}</h2></span>
+        <!--<span><h2>$400</h2></span>-->
+    </div>
+    <div class="btn-container">
+        <button type="button" class="btn btn-primary btn-big">Submit</button>
+    </div>
+    <h1 class="text-center" style="flex:none;">{{ place | async | ordinal | uppercase }}</h1>
+</div>
+

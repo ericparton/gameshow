@@ -12,6 +12,7 @@ export class PlayerScreenComponent implements OnInit {
     public submissions: FirebaseListObservable<any[]>;
     public questions: FirebaseListObservable<any[]>;
     public place: Observable<number>;
+    public name: Observable<string>;
 
     constructor(private af: AngularFire) {
         this.questions = af.database.list('/questions', {
@@ -30,9 +31,9 @@ export class PlayerScreenComponent implements OnInit {
             }
         });
 
-        this.place = Observable.combineLatest([this.submissions, this.af.auth]).map(result => {
+        this.place = Observable.combineLatest(this.submissions, this.af.auth).map(result => {
             let submissionz: any[] = result[0];
-            let uid :string = result[1].auth.uid;
+            let uid: string = result[1].auth.uid;
 
             for (let _i = 0; _i < submissionz.length; _i++) {
                 if (submissionz[_i].$key === uid) {
@@ -42,9 +43,15 @@ export class PlayerScreenComponent implements OnInit {
 
             return null;
         });
+
+        this.name = af.auth
+            .map(state => state.auth.uid)
+            .flatMap(uid => af.database.object(`/users/${uid}`))
+            .map(user => {
+                return user.name
+            });
     }
 
     ngOnInit() {
     }
-
 }
