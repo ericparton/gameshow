@@ -1,20 +1,42 @@
-<div *ngFor="let question of questions | async" class="container">
-    <h3>Latest Question</h3>
+<div *ngFor="let question of questions | async" class="container-fluid">
+    <h2>Latest Question</h2>
     <div class="form-group">
         <label for="value">Value:</label>
-        <span id="value">${{question.value}}</span>
+        <span id="value">{{question.value | currency:"USD":true}}</span>
     </div>
     <div class="form-group">
         <label for="asked">Asked:</label>
-        <span id="asked">{{question.$key | date:'medium'}}</span>
+        <span id="asked">{{question.$key | millisecondsDate}}</span>
     </div>
-    <div class="form-group">
-        <label for="list">Submissions:</label>
-        <ol id="list">
-            <li *ngFor="let submission of submissions | async">
-                {{ getUser((users | async),submission.$key)?.name }} {{ submission.submitted_on | millisecondsDate }}
-            </li>
-        </ol>
+    <label for="list">Submissions:</label>
+    <div class="table-responsive">
+        <table id="list" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Submitted</th>
+                    <td class="table-btn"></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let idx = index; let submission of submissions | async">
+                    <td>{{idx + 1}}</td>
+                    <td>{{ getUser((users | async),submission.$key)?.name }}</td>
+                    <td>{{ submission.submitted_on | millisecondsDate }}</td>
+                    <td class="table-btn">
+                        <div class="btn-group">
+                            <label class="btn btn-success" btnRadio="Left" uncheckable>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                            </label>
+                            <label class="btn btn-danger" btnRadio="Middle" uncheckable>
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <!--<button (click)="toggleGame($event)">{{(in_progress | async)?.$value == true ? "Stop" : "Start" }} Game</button>-->

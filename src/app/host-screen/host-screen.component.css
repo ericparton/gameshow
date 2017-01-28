@@ -1,0 +1,25 @@
+.btn:focus {
+    outline: none;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+td {
+    vertical-align: middle !important;
+    white-space: normal !important;
+}
+
+.table-btn {
+    min-width: 130px;
+    padding: 4px;
+}
+
+.table-btn div {
+    width: 100%;
+}
+
+.table-btn div label {
+    width: 50%;
+}

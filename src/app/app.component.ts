@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
             else {
                 this.af.auth.login();
             }
-        })
+        });
 
 // this.af.auth.filter(state => state != null).flatMap(state => {
 //     let user: FirebaseObjectObservable<any> = this.af.database.object(`/users/${state.uid}`);
