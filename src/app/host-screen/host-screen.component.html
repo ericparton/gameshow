@@ -1,1 +1,20 @@
-<button (click)="toggleGame($event)">{{(in_progress | async)?.$value == true ? "Stop" : "Start" }} Game</button>
+<div *ngFor="let question of questions | async" class="container">
+    <h3>Latest Question</h3>
+    <div class="form-group">
+        <label for="value">Value:</label>
+        <span id="value">${{question.value}}</span>
+    </div>
+    <div class="form-group">
+        <label for="asked">Asked:</label>
+        <span id="asked">{{question.$key | date:'medium'}}</span>
+    </div>
+    <div class="form-group">
+        <label for="list">Submissions:</label>
+        <ol id="list">
+            <li *ngFor="let submission of submissions | async">
+                {{ getUser((users | async),submission.$key)?.name }} {{ submission.submitted_on | millisecondsDate }}
+            </li>
+        </ol>
+    </div>
+</div>
+<!--<button (click)="toggleGame($event)">{{(in_progress | async)?.$value == true ? "Stop" : "Start" }} Game</button>-->
