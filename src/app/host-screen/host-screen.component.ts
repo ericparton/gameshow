@@ -49,5 +49,4 @@ export class HostScreenComponent implements OnInit {
 
         return null
     }
-
 }
