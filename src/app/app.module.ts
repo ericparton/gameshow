@@ -26,7 +26,8 @@ const myFirebaseConfig = {
 const appRoutes: Routes = [
     {path: '', pathMatch: 'full', component: AppComponent},
     {path: 'host', component: HostScreenComponent},
-    {path: 'player', component: PlayerScreenComponent}
+    {path: 'player', component: PlayerScreenComponent},
+    {path: 'scoreboard', component: ScoreboardScreenComponent}
 ];
 
 const myFirebaseAuthConfig = {

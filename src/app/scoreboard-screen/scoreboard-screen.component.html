@@ -1,3 +1,21 @@
-<p>
-  scoreboard-screen works!
-</p>
+<div class="container-fluid">
+    <h2>Scoreboard</h2>
+    <div class="table-responsive">
+        <table id="list" class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Points</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let idx = index; let userPoint of userPoints | async">
+                <td>{{idx + 1}}</td>
+                <td>{{ userPoint.name }}</td>
+                <td>{{ userPoint.points | currency:'USD':true }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
