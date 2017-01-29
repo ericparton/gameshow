@@ -9,7 +9,7 @@ import {Observable} from "rxjs";
 })
 export class ScoreboardScreenComponent implements OnInit {
 
-    public userPoints : Observable<any[]>;
+    public userPoints: Observable<any[]>;
 
     constructor(private af: AngularFire) {
         let date: Date = new Date();
@@ -37,15 +37,15 @@ export class ScoreboardScreenComponent implements OnInit {
 
         this.userPoints = Observable.combineLatest(answers, questions, users, (answers, questions, users) => {
             let userPointsMap: Map<string,number> = new Map<string,number>();
-            let questionPointsMap : Map<string,number> = new Map<string,number>();
-            let userPointsList : any[] = [];
+            let questionPointsMap: Map<string,number> = new Map<string,number>();
+            let userPointsList: any[] = [];
 
             Object.keys(users).filter(key => !key.startsWith('$')).forEach(key => userPointsMap.set(key, 0));
             questions.forEach(question => questionPointsMap.set(question.$key, question.value));
 
             answers.forEach(answer => {
                 Object.keys(answer).filter(key => !key.startsWith('$')).forEach(key => {
-                    let modifier : number = answer[key].correct === true ? 1 : -1;
+                    let modifier: number = answer[key].correct === true ? 1 : -1;
                     let questionValue = questionPointsMap.get(answer.$key);
                     let userTotalPoints = userPointsMap.get(key) + (questionValue * modifier);
 
@@ -60,11 +60,22 @@ export class ScoreboardScreenComponent implements OnInit {
                 })
             });
 
+            userPointsList.sort((o1, o2) => {
+                if (o2.points > o1.points) {
+                    return 1;
+                }
+
+                if (o2.points < o1.points) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
             return userPointsList;
         });
     }
 
     ngOnInit() {
     }
-
 }
