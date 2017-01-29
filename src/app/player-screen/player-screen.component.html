@@ -13,7 +13,7 @@
     </div>
     <div>
         <span>
-            <h2 [style.color]="getColor(money)" class="info">{{ money | currency:'USD':true }}</h2>
+            <h2 [style.color]="getColor(money | async)" class="info">{{ money | async | currency:'USD':true }}</h2>
         </span>
     </div>
 </div>

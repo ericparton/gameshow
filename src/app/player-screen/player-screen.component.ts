@@ -12,12 +12,11 @@ export class PlayerScreenComponent implements OnInit {
 
     public place: Observable<number>;
     public name: Observable<string>;
-    public money: number = 0;
+    public money: Observable<number>;
 
-    public uid: String;
-    public question: String;
-
-    private subscription: Subscription;
+    private uid: String;
+    private question: String;
+    private month: Date;
 
     constructor(private af: AngularFire) {
         let question = af.database.list('/questions', {
@@ -56,44 +55,33 @@ export class PlayerScreenComponent implements OnInit {
             return -1;
         });
 
+        this.month = new Date();
+        this.month.setDate(1);
+        this.month.setHours(0);
+        this.month.setMinutes(0);
+
         this.name = uid
             .flatMap(uid => af.database.object(`/users/${uid}`))
             .map(user => user.name);
 
-        uid.flatMap(uid => {
-            let date: Date = new Date();
-            date.setDate(1);
-            date.setHours(0);
-            date.setMinutes(0);
-
-            return af.database.list(`/answersByUser/${uid}`, {
-                query: {
-                    orderByKey: true,
-                    startAt: `${date.getTime()}`
-                }
-            })
-        }).subscribe(answers => {
-            let bufferCount = answers.length;
-            let keys = Observable.from(answers).map(answer => answer.$key);
-
-            if (this.subscription) {
-                this.subscription.unsubscribe();
+        let query = {
+            query: {
+                orderByKey: true,
+                startAt: `${this.month.getTime()}`
             }
+        };
 
-            this.subscription = keys.flatMap(key => af.database.object(`/questions/${key}`))
-                .bufferCount(bufferCount)
-                .do(questions => {
-                    let sum: number = 0;
-                    let answerMap: Map<string,boolean> = new Map<string,boolean>();
+        let answers = uid.flatMap(uid => af.database.list(`/answersByUser/${uid}`, query));
+        let questions = af.database.list(`/questions`, query);
 
-                    answers.forEach(answer => answerMap.set(answer.$key, answer.correct));
+        this.money = Observable.combineLatest(answers, questions, (answers, questions) => {
+            let total: number = 0;
+            let questionValueMap: Map<string,number> = new Map<string,number>();
 
-                    questions.forEach((question) => {
-                        sum += (answerMap.get(question.$key) ? 1 : -1) * question.value;
-                    });
+            questions.forEach(question => questionValueMap.set(question.$key, question.value));
+            answers.forEach(answer => total += (questionValueMap.get(answer.$key) * (answer.correct === true ? 1 : -1)));
 
-                    this.money = sum;
-                }).subscribe();
+            return total;
         });
     }
 
@@ -110,12 +98,11 @@ export class PlayerScreenComponent implements OnInit {
         submissionByQuestion.set(payload);
     }
 
-    getColor(money: number)
-    {
-        if(isNullOrUndefined(money) || money >= 0 ){
+    getColor(money: number) {
+        if (isNullOrUndefined(money) || money >= 0) {
             return "black";
         }
-        else{
+        else {
             return "red";
         }
     }
