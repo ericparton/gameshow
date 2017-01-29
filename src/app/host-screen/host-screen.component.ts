@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
-import {isUndefined} from "util";
 import {isNullOrUndefined} from "util";
 
 @Component({
@@ -45,6 +44,7 @@ export class HostScreenComponent implements OnInit {
 
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
             let map: Map<string,boolean> = new Map<string,boolean>();
+            this.answerModel = [];
 
             s2.forEach(s => map.set(s.$key, s.correct));
 
@@ -81,16 +81,18 @@ export class HostScreenComponent implements OnInit {
 
     onAnswerStateChange(uid: string, event: string) {
         let answer = this.af.database.object(`/answers/${this.question.$key}/${uid}`);
+        let index = this.af.database.object(`/users/${uid}/answers/${this.question.$key}`);
 
         if (!isNullOrUndefined(event)) {
             let value = event.trim().toLowerCase() === 'true';
             answer.set({
-                value: this.question.value,
                 correct: value
             });
+            index.set(new Date().getTime());
         }
         else {
             answer.remove();
+            index.remove();
         }
     }
 }

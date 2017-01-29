@@ -33,7 +33,6 @@ export class PlayerScreenComponent implements OnInit {
         });
 
         let submissions: Observable<any[]> = question.flatMap(question => {
-            console.log(question);
             return af.database.list(`/submissions/${question}`, {
                 query: {
                     orderByChild: 'submitted_on'
@@ -54,17 +53,40 @@ export class PlayerScreenComponent implements OnInit {
             return -1;
         });
 
-        this.name = af.auth
-            .map(state => state.auth.uid)
+        let uid = af.auth.map(state => state.auth.uid).do(uid => this.uid = uid);
+
+        this.name = uid
             .flatMap(uid => af.database.object(`/users/${uid}`))
             .map(user => user.name);
 
-        // this.money = af.auth
-        //     .map(state => state.auth.uid)
-        //     .flatMap(uid => af.database.object(`/users/${uid}`))
-        //     .map(user => user.name);
+        let keys = uid.flatMap(uid => af.database.list(`/users/${uid}/answers`));
 
-        this.place.subscribe(place => console.log(place));
+        keys.subscribe(keys => {
+            let bufferCount = keys.length;
+            let sequentialKeys = Observable.from(keys).map(key => key.$key);
+
+            let answers = sequentialKeys
+                .flatMap(key => af.database.object(`/answers/${key}`))
+                .bufferCount(bufferCount);
+
+            let questions = sequentialKeys
+                .flatMap(key => af.database.object(`/questions/${key}`))
+                .bufferCount(bufferCount);
+
+            this.money = Observable.combineLatest(questions, answers, (s1, s2) => {
+                let map: Map<string,boolean> = new Map<string,boolean>();
+                let sum: number = 0;
+
+                s2.forEach(s => map.set(s.$key, s[`${this.uid}`].correct));
+
+                s1.forEach((s) => {
+                    console.log(s);
+                    sum += (map.get(s.$key) ? 1 : -1) * s.value;
+                });
+
+                return sum;
+            });
+        })
     }
 
     ngOnInit() {
