@@ -11,7 +11,7 @@ export class PlayerScreenComponent implements OnInit {
 
     public place: Observable<number>;
     public name: Observable<string>;
-    public money: number;
+    public money: number = 0;
 
     public uid: String;
     public question: String;
@@ -84,8 +84,6 @@ export class PlayerScreenComponent implements OnInit {
                 .do(questions => {
                     let sum: number = 0;
                     let answerMap: Map<string,boolean> = new Map<string,boolean>();
-
-                    console.log(answers);
 
                     answers.forEach(answer => answerMap.set(answer.$key, answer.correct));
 
