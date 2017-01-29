@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire} from "angularfire2";
-import {Observable, Subscription} from "rxjs";
+import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
 
 @Component({
