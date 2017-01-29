@@ -30,12 +30,12 @@ export class PlayerScreenComponent implements OnInit {
             this.question = question;
         });
 
-        af.auth.subscribe(state => {
-            this.uid = state.auth.uid;
-        });
+        let uid = af.auth.map(state => state.auth.uid);
+
+        uid.subscribe(uid => this.uid = uid);
 
         let submissions: Observable<any[]> = question.flatMap(question => {
-            return af.database.list(`/submissions/${question}`, {
+            return af.database.list(`/submissionsByQuestion/${question}`, {
                 query: {
                     orderByChild: 'submitted_on'
                 }
@@ -55,53 +55,59 @@ export class PlayerScreenComponent implements OnInit {
             return -1;
         });
 
-        let uid = af.auth.map(state => state.auth.uid).do(uid => this.uid = uid);
-
         this.name = uid
             .flatMap(uid => af.database.object(`/users/${uid}`))
             .map(user => user.name);
 
-        let keys = uid.flatMap(uid => af.database.list(`/users/${uid}/answers`));
+        uid.flatMap(uid => {
+            let date: Date = new Date();
+            date.setDate(1);
+            date.setHours(0);
+            date.setMinutes(0);
 
-        keys.subscribe(keys => {
-            let bufferCount = keys.length;
-            let sequentialKeys = Observable.from(keys).map(key => key.$key);
+            return af.database.list(`/answersByUser/${uid}`, {
+                query: {
+                    orderByKey: true,
+                    startAt: `${date.getTime()}`
+                }
+            })
+        }).subscribe(answers => {
+            let bufferCount = answers.length;
+            let keys = Observable.from(answers).map(answer => answer.$key);
 
             if (this.subscription) {
                 this.subscription.unsubscribe();
             }
 
-            let answers = sequentialKeys
-                .flatMap(key => af.database.object(`/answers/${key}`))
-                .bufferCount(bufferCount);
+            this.subscription = keys.flatMap(key => af.database.object(`/questions/${key}`))
+                .bufferCount(bufferCount)
+                .do(questions => {
+                    let sum: number = 0;
+                    let answerMap: Map<string,boolean> = new Map<string,boolean>();
 
-            let questions = sequentialKeys
-                .flatMap(key => af.database.object(`/questions/${key}`))
-                .bufferCount(bufferCount);
+                    console.log(answers);
 
-            this.subscription = Observable.combineLatest(questions, answers, (s1, s2) => {
-                let map: Map<string,boolean> = new Map<string,boolean>();
-                let sum: number = 0;
+                    answers.forEach(answer => answerMap.set(answer.$key, answer.correct));
 
-                s2.forEach(s => map.set(s.$key, s[`${this.uid}`].correct));
+                    questions.forEach((question) => {
+                        sum += (answerMap.get(question.$key) ? 1 : -1) * question.value;
+                    });
 
-                s1.forEach((s) => {
-                    sum += (map.get(s.$key) ? 1 : -1) * s.value;
-                });
-
-                this.money = sum;
-            }).subscribe();
-        })
+                    this.money = sum;
+                }).subscribe();
+        });
     }
 
     ngOnInit() {
     }
 
     onClick() {
-        let now: number = new Date().getTime();
-        this.af.database.object(`/submissions/${this.question}/${this.uid}`).set({
-            submitted_on: now
-        });
-        this.af.database.object(`/users/${this.uid}/submissions/${this.question}`).set(true);
+        let payload = {submitted_on: new Date().getTime()};
+
+        let submissionByUser = this.af.database.object(`/submissionsByUser/${this.uid}/${this.question}`);
+        let submissionByQuestion = this.af.database.object(`/submissionsByQuestion/${this.question}/${this.uid}`);
+
+        submissionByUser.set(payload);
+        submissionByQuestion.set(payload);
     }
 }

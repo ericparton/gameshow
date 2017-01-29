@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AngularFire} from "angularfire2";
+import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
 
@@ -31,7 +31,7 @@ export class HostScreenComponent implements OnInit {
 
         let submissions = question
             .flatMap(question => {
-                return af.database.list(`/submissions/${question.$key}`, {
+                return af.database.list(`/submissionsByQuestion/${question.$key}`, {
                     query: {
                         orderByChild: 'submitted_on'
                     }
@@ -39,7 +39,7 @@ export class HostScreenComponent implements OnInit {
             });
 
         let answers = question.flatMap(question => {
-            return af.database.list(`/answers/${question.$key}`)
+            return af.database.list(`/answersByQuestion/${question.$key}`)
         });
 
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
@@ -80,19 +80,20 @@ export class HostScreenComponent implements OnInit {
     }
 
     onAnswerStateChange(uid: string, event: string) {
-        let answer = this.af.database.object(`/answers/${this.question.$key}/${uid}`);
-        let index = this.af.database.object(`/users/${uid}/answers/${this.question.$key}`);
+        let answerByUser = this.af.database.object(`/answersByUser/${uid}/${this.question.$key}`);
+        let answerByQuestion = this.af.database.object(`/answersByQuestion/${this.question.$key}/${uid}`);
 
-        if (!isNullOrUndefined(event)) {
-            let value = event.trim().toLowerCase() === 'true';
-            answer.set({
-                correct: value
-            });
-            index.set(new Date().getTime());
+        this.setAnswer(event, answerByUser);
+        this.setAnswer(event, answerByQuestion);
+    }
+
+    private setAnswer(correct: string, answer: FirebaseObjectObservable<any>) {
+        if (!isNullOrUndefined(correct)) {
+            let value = correct.trim().toLowerCase() === 'true';
+            answer.set({correct: value});
         }
         else {
             answer.remove();
-            index.remove();
         }
     }
 }
