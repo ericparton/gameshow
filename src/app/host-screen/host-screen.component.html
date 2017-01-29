@@ -12,15 +12,15 @@
 </div>
 <hr />
 <div class="container-fluid">
-    <div *ngIf="(question | async)">
+    <div *ngIf="question">
         <h2>Latest Question</h2>
         <div class="form-group">
             <label for="value">Value:</label>
-            <span id="value">{{(question | async )?.value | currency:"USD":true}}</span>
+            <span id="value">{{question?.value | currency:"USD":true}}</span>
         </div>
         <div class="form-group">
             <label for="asked">Asked:</label>
-            <span id="asked">{{(question | async)?.$key | millisecondsDate}}</span>
+            <span id="asked">{{question?.$key | millisecondsDate}}</span>
         </div>
     </div>
     <div *ngIf="(responses | async)?.length > 0">
