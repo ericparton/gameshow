@@ -6,7 +6,6 @@
 
 .btn-container {
     flex: 5;
-    margin-bottom: 15px;
 }
 
 .btn-big {
@@ -22,16 +21,9 @@
     font-size: 300px;
 }
 
-.header {
-    clear: both;
-}
-
-.name{
-    float:left;
-}
-
-.money{
-    float:right;
+h2 {
+    text-align: center;
+    margin-top: 10px;
 }
 
 .place {

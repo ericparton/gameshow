@@ -1,8 +1,7 @@
 <div class="container-fluid">
-    <div class="header">
+    <div>
         <span>
-            <h2 class="name">{{ name | async }}</h2>
-            <h2 class="money">{{ money | currency:'USD':true }}</h2>
+            <h2 class="info">{{ name | async }}</h2>
         </span>
     </div>
     <div class="btn-container">
@@ -11,6 +10,11 @@
             <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
             <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
         </button>
+    </div>
+    <div>
+        <span>
+            <h2 [style.color]="getColor(money)" class="info">{{ money | currency:'USD':true }}</h2>
+        </span>
     </div>
 </div>
 

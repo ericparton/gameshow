@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire} from "angularfire2";
 import {Observable, Subscription} from "rxjs";
+import {isNullOrUndefined} from "util";
 
 @Component({
     selector: 'app-player-screen',
@@ -107,5 +108,15 @@ export class PlayerScreenComponent implements OnInit {
 
         submissionByUser.set(payload);
         submissionByQuestion.set(payload);
+    }
+
+    getColor(money: number)
+    {
+        if(isNullOrUndefined(money) || money >= 0 ){
+            return "black";
+        }
+        else{
+            return "red";
+        }
     }
 }
