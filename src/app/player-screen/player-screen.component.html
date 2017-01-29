@@ -2,7 +2,7 @@
     <div class="header">
         <span>
             <h2 class="name">{{ name | async }}</h2>
-            <h2 class="money">{{ money | async | currency:'USD':true }}</h2>
+            <h2 class="money">{{ money | currency:'USD':true }}</h2>
         </span>
     </div>
     <div class="btn-container">

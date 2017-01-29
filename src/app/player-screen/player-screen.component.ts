@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire} from "angularfire2";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 
 @Component({
     selector: 'app-player-screen',
@@ -11,10 +11,12 @@ export class PlayerScreenComponent implements OnInit {
 
     public place: Observable<number>;
     public name: Observable<string>;
-    public money: Observable<number>;
+    public money: number;
 
     public uid: String;
     public question: String;
+
+    private subscription: Subscription;
 
     constructor(private af: AngularFire) {
         let question = af.database.list('/questions', {
@@ -65,6 +67,10 @@ export class PlayerScreenComponent implements OnInit {
             let bufferCount = keys.length;
             let sequentialKeys = Observable.from(keys).map(key => key.$key);
 
+            if (this.subscription) {
+                this.subscription.unsubscribe();
+            }
+
             let answers = sequentialKeys
                 .flatMap(key => af.database.object(`/answers/${key}`))
                 .bufferCount(bufferCount);
@@ -73,19 +79,18 @@ export class PlayerScreenComponent implements OnInit {
                 .flatMap(key => af.database.object(`/questions/${key}`))
                 .bufferCount(bufferCount);
 
-            this.money = Observable.combineLatest(questions, answers, (s1, s2) => {
+            this.subscription = Observable.combineLatest(questions, answers, (s1, s2) => {
                 let map: Map<string,boolean> = new Map<string,boolean>();
                 let sum: number = 0;
 
                 s2.forEach(s => map.set(s.$key, s[`${this.uid}`].correct));
 
                 s1.forEach((s) => {
-                    console.log(s);
                     sum += (map.get(s.$key) ? 1 : -1) * s.value;
                 });
 
-                return sum;
-            });
+                this.money = sum;
+            }).subscribe();
         })
     }
 
