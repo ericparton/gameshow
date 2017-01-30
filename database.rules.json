@@ -1,6 +1,34 @@
 {
   "rules": {
     ".read": "auth != null",
-    ".write": "auth != null"
+    "answersByQuestion":{
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+    },
+    "answersByUser": {
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+    },
+    "hosts": {
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+    },
+    "questions":{
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+    },
+    "submissionsByQuestion": {
+      "$timestamp": {
+        "$uid": {
+          ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))"
+        }
+      }
+    },
+    "submissionsByUser": {
+      "$uid": {
+        ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))"
+      }
+    },
+    "users": {
+      "$uid": {
+        ".write": "$uid === auth.uid"
+      }
+    }
   }
 }
