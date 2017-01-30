@@ -4,7 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 import {RouterModule, Routes} from '@angular/router';
-import { ButtonsModule } from 'ng2-bootstrap';
+import {ButtonsModule} from 'ng2-bootstrap';
 
 import {AppComponent} from './app.component';
 import {HostScreenComponent} from './host-screen/host-screen.component';
@@ -14,6 +14,7 @@ import {ScoreboardScreenComponent} from './scoreboard-screen/scoreboard-screen.c
 import {MillisecondDatePipe} from "./date-with-milliseconds.pipe";
 import {OrdinalPipe} from "./ordinal.pipe";
 import {TitleCasePipe} from "./title-case.pipe";
+import {HostRouteGuard} from "./host-screen/host-screen.guard";
 
 const myFirebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -25,7 +26,7 @@ const myFirebaseConfig = {
 
 const appRoutes: Routes = [
     {path: '', pathMatch: 'full', component: AppComponent},
-    {path: 'host', component: HostScreenComponent},
+    {path: 'host', component: HostScreenComponent, canActivate: [HostRouteGuard]},
     {path: 'player', component: PlayerScreenComponent},
     {path: 'scoreboard', component: ScoreboardScreenComponent}
 ];
@@ -54,7 +55,7 @@ const myFirebaseAuthConfig = {
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
         RouterModule.forRoot(appRoutes, {useHash: true})
     ],
-    providers: [],
+    providers: [HostRouteGuard],
     bootstrap: [AppComponent]
 })
 export class AppModule {
