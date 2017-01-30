@@ -46,8 +46,8 @@ export class ScoreboardScreenComponent implements OnInit {
             answers.forEach(answer => {
                 Object.keys(answer).filter(key => !key.startsWith('$')).forEach(key => {
                     let modifier: number = answer[key].correct === true ? 1 : -1;
-                    let questionValue = questionPointsMap.get(answer.$key);
-                    let userTotalPoints = userPointsMap.get(key) + (questionValue * modifier);
+                    let questionValue: number = questionPointsMap.get(answer.$key);
+                    let userTotalPoints: number = userPointsMap.get(key) + (questionValue * modifier);
 
                     userPointsMap.set(key, userTotalPoints);
                 })
@@ -61,19 +61,29 @@ export class ScoreboardScreenComponent implements OnInit {
             });
 
             userPointsList.sort((o1, o2) => {
-                if (o2.points > o1.points) {
-                    return 1;
+                let pointComparison: number = ScoreboardScreenComponent.compare(o2.points, o1.points);
+
+                if (pointComparison != 0) {
+                    return pointComparison;
                 }
 
-                if (o2.points < o1.points) {
-                    return -1;
-                }
-
-                return 0;
+                return ScoreboardScreenComponent.compare(o1.name.split(' ')[1], o2.name.split(' ')[1]);
             });
 
             return userPointsList;
         });
+    }
+
+    private static compare(o1: any, o2: any): number {
+        if (o1 > o2) {
+            return 1;
+        }
+        else if (o1 < o2) {
+            return -1;
+        }
+        else {
+            return 0;
+        }
     }
 
     ngOnInit() {
