@@ -2,13 +2,32 @@
   "rules": {
     ".read": "auth != null",
     "answersByQuestion":{
-      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true",
+      "$timestamp": {
+        "$uid": {
+          ".validate": "newData.hasChild('correct')",
+          "correct": {
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
     },
     "answersByUser": {
-      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true",
+      "$uid": {
+        "$timestamp": {
+          ".validate": "newData.hasChild('correct')",
+          "correct": {
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
     },
     "hosts": {
-      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
+      ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true",
+      "$uid": {
+        ".validate": "newData.isBoolean()"
+      }
     },
     "questions":{
       ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true"
@@ -16,18 +35,32 @@
     "submissionsByQuestion": {
       "$timestamp": {
         "$uid": {
-          ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))"
+          ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))",
+          ".validate": "newData.hasChild('submitted_on')",
+          "submitted_on": {
+            ".validate": "newData.isNumber()"
+          }
         }
       }
     },
     "submissionsByUser": {
       "$uid": {
-        ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))"
+        ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))",
+        "$timestamp": {
+          ".validate": "newData.hasChild('submitted_on')",
+          "submitted_on": {
+            ".validate": "newData.isNumber()"
+          }
+        }
       }
     },
     "users": {
       "$uid": {
-        ".write": "$uid === auth.uid"
+        ".write": "$uid === auth.uid",
+        ".validate": "newData.hasChild('name')",
+        "name": {
+          ".validate": "newData.isString()"
+        }
       }
     }
   }
