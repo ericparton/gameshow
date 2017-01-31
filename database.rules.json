@@ -64,7 +64,7 @@
       }
     },
     "isGameInProgress": {
-        ".write": "auth != null && ((root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true) || ($uid === auth.uid))",
+        ".write": "auth != null && root.child('hosts').hasChild(auth.uid) && root.child('hosts').child(auth.uid).val() === true",
         ".validate": "newData.isBoolean()"
     }
   }
