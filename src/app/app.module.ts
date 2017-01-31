@@ -5,7 +5,7 @@ import {HttpModule} from '@angular/http';
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 import {RouterModule, Routes} from '@angular/router';
 import {ButtonsModule} from 'ng2-bootstrap';
-import { CollapseDirective } from 'ng2-bootstrap';
+import {CollapseModule} from 'ng2-bootstrap';
 
 import {AppComponent} from './app.component';
 import {HostScreenComponent} from './host-screen/host-screen.component';
@@ -46,8 +46,7 @@ const myFirebaseAuthConfig = {
         ScoreboardScreenComponent,
         MillisecondDatePipe,
         OrdinalPipe,
-        TitleCasePipe,
-        CollapseDirective
+        TitleCasePipe
         // WaveComponent
     ],
     imports: [
@@ -55,6 +54,7 @@ const myFirebaseAuthConfig = {
         FormsModule,
         HttpModule,
         ButtonsModule,
+        CollapseModule,
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
         RouterModule.forRoot(appRoutes, {useHash: true})
     ],
