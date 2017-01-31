@@ -1,9 +1,4 @@
-<div class="container-fluid">
-    <div>
-        <span>
-            <h2 class="info">{{ name | async }}</h2>
-        </span>
-    </div>
+<div class="container-fluid below-fixed-navbar">
     <div class="btn-container">
         <button [disabled]="(place | async) > 0" *ngIf="(place | async)" type="button"
                 (click)="onClick()" class="btn btn-primary btn-big">

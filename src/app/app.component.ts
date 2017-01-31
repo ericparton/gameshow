@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FirebaseObjectObservable, AngularFire} from "angularfire2";
 import {Router} from "@angular/router";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'app-root',
@@ -10,7 +11,21 @@ import {Router} from "@angular/router";
 
 export class AppComponent implements OnInit {
 
+    public isHost: Observable<boolean>;
+    public userName: Observable<string>;
+    public isCollapsed: boolean = true;
+
     constructor(private af: AngularFire, private router: Router) {
+        this.isHost = Observable.combineLatest(
+            af.auth.map(state => state.auth.uid),
+            af.database.object('/hosts'),
+            (uid, hosts) => {
+                return hosts[uid] === true;
+            });
+
+        this.userName = af.auth.map(state => state.auth.uid)
+            .flatMap(uid => af.database.object(`/users/${uid}`))
+            .map(user => user.name);
     }
 
     ngOnInit(): void {
@@ -57,4 +72,7 @@ export class AppComponent implements OnInit {
 // this.af.auth.filter(state => state == null).subscribe(state => this.router.navigate(['/welcome']));
     }
 
+    getRoute(): string {
+        return this.router.url;
+    }
 }

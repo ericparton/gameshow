@@ -11,7 +11,6 @@ import {isNullOrUndefined} from "util";
 export class PlayerScreenComponent implements OnInit {
 
     public place: Observable<number>;
-    public name: Observable<string>;
     public money: Observable<number>;
 
     private uid: String;
@@ -59,10 +58,6 @@ export class PlayerScreenComponent implements OnInit {
         this.month.setDate(1);
         this.month.setHours(0);
         this.month.setMinutes(0);
-
-        this.name = uid
-            .flatMap(uid => af.database.object(`/users/${uid}`))
-            .map(user => user.name);
 
         let query = {
             query: {

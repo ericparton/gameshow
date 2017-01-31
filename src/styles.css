@@ -6,3 +6,7 @@ html, body, .viewport {
     height: 100%;
     margin: 0;
 }
+
+.below-fixed-navbar {
+    padding-top: 60px;
+}

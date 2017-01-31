@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container below-fixed-navbar">
     <h2>New Question</h2>
     <form (ngSubmit)="onNewQuestionSubmit()">
         <div class="form-group">
@@ -9,9 +9,9 @@
             <button class="btn btn-primary submit" type="submit">Submit</button>
         </div>
     </form>
+    <hr />
 </div>
-<hr />
-<div class="container-fluid">
+<div class="container">
     <div *ngIf="question">
         <h2>Latest Question</h2>
         <div class="form-group">
