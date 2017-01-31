@@ -1,4 +1,17 @@
 <div class="container below-fixed-navbar">
+    <button type="button"
+            class="btn btn-lg btn-wide"
+            [class.btn-success]="!gameStartedModel"
+            [class.btn-danger]="gameStartedModel"
+            [(ngModel)]="gameStartedModel"
+            (ngModelChange)="onGameStartedChange($event)"
+            [ngModelOptions]="{standalone: true}"
+            btnCheckbox>
+        {{gameStartedModel ? 'Stop' : 'Start'}} Game
+    </button>
+    <hr />
+</div>
+<div class="container">
     <h2>New Question</h2>
     <form (ngSubmit)="onNewQuestionSubmit()">
         <div class="form-group">

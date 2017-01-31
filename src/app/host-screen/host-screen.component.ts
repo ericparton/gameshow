@@ -12,13 +12,18 @@ export class HostScreenComponent implements OnInit {
 
     public responses: Observable<any[]>;
     public users: Observable<any>;
+    public isGameInProgress: Observable<boolean>;
 
     public question: any;
     public valueModel: number;
     public answerModel: string[] = [];
+    public gameStartedModel: boolean = false;
 
     constructor(private af: AngularFire) {
         this.users = af.database.object('/users');
+
+        this.isGameInProgress = af.database.object('/isGameInProgress').map(object => object.$value);
+        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
 
         let question = af.database.list('/questions', {
             query: {
@@ -77,6 +82,10 @@ export class HostScreenComponent implements OnInit {
         });
 
         this.valueModel = null;
+    }
+
+    onGameStartedChange(gameStarted: boolean) {
+        this.af.database.object('/isGameInProgress').set(gameStarted);
     }
 
     onAnswerStateChange(uid: string, event: string) {

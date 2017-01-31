@@ -33,3 +33,8 @@ hr {
 .submit {
     margin-top: 10px;
 }
+
+.btn-wide {
+    width: 100%;
+    margin-bottom: 10px;
+}
