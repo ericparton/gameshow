@@ -1,6 +1,6 @@
 <div class="container-fluid below-fixed-navbar above-fixed-navbar">
     <div class="btn-container">
-        <button [disabled]="(place | async) > 0" *ngIf="(place | async) && (isGameInProgress | async)" type="button"
+        <button [disabled]="(place | async) > 0" *ngIf="(place | async) && (isGameInProgress | async) === true" type="button"
                 (click)="onClick()" class="btn btn-primary btn-big">
             <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
             <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
-                <span *ngIf="(isGameInProgress | async) && (question | async)">
+                <span *ngIf="(isGameInProgress | async) === true && (question | async)">
                     <i class="fa fa-question-circle-o" aria-hidden="true"></i>
                     {{ ((question | async)?.value ? (question | async)?.value : 0) | currency:'USD':true }}
                 </span>
