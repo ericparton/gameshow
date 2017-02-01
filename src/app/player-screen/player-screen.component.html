@@ -16,7 +16,7 @@
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
                 <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-                {{ (question | async)?.value | currency:'USD':true }}
+                {{ ((question | async)?.value ? (question | async)?.value : 0) | currency:'USD':true }}
             </p>
             <div class=" navbar-brand right-footer">
                 <span [style.color]="getColor(money | async)">
