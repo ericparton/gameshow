@@ -15,13 +15,14 @@
     <div class="container-fluid">
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
-                Question: {{ (question | async)?.value | currency:'USD':true }}
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                {{ (question | async)?.value | currency:'USD':true }}
             </p>
             <div class=" navbar-brand right-footer">
-                You:
                 <span [style.color]="getColor(money | async)">
                     {{ money | async | currency:'USD':true }}
                 </span>
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i>
             </div>
         </div>
     </div>

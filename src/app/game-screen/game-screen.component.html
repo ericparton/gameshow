@@ -11,9 +11,15 @@
     </div>
     <div class="collapse navbar-collapse" [collapse]="isCollapsed">
       <ul class="nav navbar-nav">
-        <li *ngIf="(isHost | async)" routerLinkActive="active"><a routerLink="/game/host" (click)="isCollapsed=true">Control Console</a></li>
-        <li *ngIf="!(isHost | async)" routerLinkActive="active"><a routerLink="/game/player" (click)="isCollapsed=true">Buzzer</a></li>
-        <li routerLinkActive="active"><a routerLink="/game/scoreboard" (click)="isCollapsed=true">Scoreboard</a></li>
+        <li *ngIf="(isHost | async)" routerLinkActive="active">
+          <a routerLink="/game/host" (click)="isCollapsed=true">Control Console</a>
+        </li>
+        <li *ngIf="!(isHost | async)" routerLinkActive="active">
+          <a routerLink="/game/player" (click)="isCollapsed=true">Buzzer</a>
+        </li>
+        <li routerLinkActive="active">
+          <a routerLink="/game/scoreboard" (click)="isCollapsed=true">Scoreboard</a>
+        </li>
       </ul>
     </div>
   </div>
