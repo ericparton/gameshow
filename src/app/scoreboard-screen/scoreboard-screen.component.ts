@@ -14,8 +14,9 @@ export class ScoreboardScreenComponent implements OnInit {
     constructor(private af: AngularFire) {
         let date: Date = new Date();
         date.setDate(1);
+        date.setHours(0);
         date.setMinutes(0);
-        date.setMinutes(0);
+        date.setMilliseconds(0);
 
         let key: string = `${date.getTime()}`;
 
@@ -67,7 +68,9 @@ export class ScoreboardScreenComponent implements OnInit {
                     return pointComparison;
                 }
 
-                return ScoreboardScreenComponent.compare(o1.name.split(' ')[1], o2.name.split(' ')[1]);
+                return ScoreboardScreenComponent.compare(
+                    ScoreboardScreenComponent.getLastName(o1.name),
+                    ScoreboardScreenComponent.getLastName(o2.name));
             });
 
             return userPointsList;
@@ -84,6 +87,12 @@ export class ScoreboardScreenComponent implements OnInit {
         else {
             return 0;
         }
+    }
+
+    private static getLastName(name: string): string
+    {
+        let arr : string[] = name.split(' ');
+        return arr[arr.length - 1].toUpperCase();
     }
 
     ngOnInit() {

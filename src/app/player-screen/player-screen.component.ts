@@ -60,6 +60,7 @@ export class PlayerScreenComponent implements OnInit {
         this.month.setDate(1);
         this.month.setHours(0);
         this.month.setMinutes(0);
+        this.month.setMilliseconds(0);
 
         let query = {
             query: {
