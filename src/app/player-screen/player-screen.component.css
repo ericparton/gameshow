@@ -29,3 +29,15 @@ h2 {
 .place {
     font-size: 300px;
 }
+
+.footer > * {
+    width: 50%;
+}
+
+.right-footer {
+    text-align: right;
+}
+
+.left-footer {
+    text-align: left;
+}

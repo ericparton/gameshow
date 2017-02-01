@@ -10,16 +10,19 @@
             <p>The game is over for now. Come back later for more chances at victory!</p>
         </div>
     </div>
-    <div>
-        <span>
-            <h2 [style.color]="getColor(money | async)" class="info">{{ money | async | currency:'USD':true }}</h2>
-        </span>
-    </div>
 </div>
 <nav class="navbar navbar-inverse navbar-default navbar-fixed-bottom">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <p class="navbar-text">wut</p>
+        <div class="navbar-header footer">
+            <p class="navbar-brand left-footer">
+                Question: {{ (question | async)?.value | currency:'USD':true }}
+            </p>
+            <div class=" navbar-brand right-footer">
+                You:
+                <span [style.color]="getColor(money | async)">
+                    {{ money | async | currency:'USD':true }}
+                </span>
+            </div>
         </div>
     </div>
 </nav>

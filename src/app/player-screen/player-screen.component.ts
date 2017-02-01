@@ -13,29 +13,30 @@ export class PlayerScreenComponent implements OnInit {
     public place: Observable<number>;
     public money: Observable<number>;
     public isGameInProgress: Observable<boolean>;
+    public question: Observable<any>;
 
     private uid: String;
-    private question: String;
+    private questionKey: String;
     private month: Date;
 
     constructor(private af: AngularFire) {
-        let question = af.database.list('/questions', {
+        this.question = af.database.list('/questions', {
             query: {
                 orderByKey: true,
                 limitToLast: 1
             }
-        }).filter(questions => questions.length > 0).map(questions => questions[0].$key);
+        }).filter(questions => questions.length > 0).map(questions => questions[0]);
 
-        question.subscribe(question => {
-            this.question = question;
+        this.question.subscribe(question => {
+            this.questionKey = question.$key;
         });
 
         let uid = af.auth.map(state => state.auth.uid);
 
         uid.subscribe(uid => this.uid = uid);
 
-        let submissions: Observable<any[]> = question.flatMap(question => {
-            return af.database.list(`/submissionsByQuestion/${question}`, {
+        let submissions: Observable<any[]> = this.question.flatMap(question => {
+            return af.database.list(`/submissionsByQuestion/${question.$key}`, {
                 query: {
                     orderByChild: 'submitted_on'
                 }
@@ -89,8 +90,8 @@ export class PlayerScreenComponent implements OnInit {
     onClick() {
         let payload = {submitted_on: new Date().getTime()};
 
-        let submissionByUser = this.af.database.object(`/submissionsByUser/${this.uid}/${this.question}`);
-        let submissionByQuestion = this.af.database.object(`/submissionsByQuestion/${this.question}/${this.uid}`);
+        let submissionByUser = this.af.database.object(`/submissionsByUser/${this.uid}/${this.questionKey}`);
+        let submissionByQuestion = this.af.database.object(`/submissionsByQuestion/${this.questionKey}/${this.uid}`);
 
         submissionByUser.set(payload);
         submissionByQuestion.set(payload);
@@ -98,10 +99,10 @@ export class PlayerScreenComponent implements OnInit {
 
     getColor(money: number) {
         if (isNullOrUndefined(money) || money >= 0) {
-            return "black";
+            return "white";
         }
         else {
-            return "red";
+            return "#ff4d4d";
         }
     }
 }

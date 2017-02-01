@@ -8,9 +8,22 @@ html, body, .viewport {
 }
 
 .below-fixed-navbar {
-    padding-top: 60px;
+    padding-top: 65px;
 }
 
 .above-fixed-navbar {
-    padding-bottom: 60px;
+    padding-bottom: 65px;
+}
+
+.navbar-inverse .navbar-text {
+    color: white;
+}
+
+.navbar-inverse .navbar-brand {
+    color: white;
+    margin: 0px;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: #ddd;
 }
