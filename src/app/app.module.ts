@@ -6,17 +6,16 @@ import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 import {RouterModule, Routes} from '@angular/router';
 import {ButtonsModule} from 'ng2-bootstrap';
 import {CollapseModule} from 'ng2-bootstrap';
-
 import {AppComponent} from './app.component';
 import {HostScreenComponent} from './host-screen/host-screen.component';
 import {PlayerScreenComponent} from './player-screen/player-screen.component';
 import {ScoreboardScreenComponent} from './scoreboard-screen/scoreboard-screen.component';
-// import {WaveComponent} from "ng-spin-kit";
 import {MillisecondDatePipe} from "./date-with-milliseconds.pipe";
 import {OrdinalPipe} from "./ordinal.pipe";
 import {TitleCasePipe} from "./title-case.pipe";
 import {HostRouteGuard} from "./host-screen/host-screen.guard";
-
+import {WelcomeScreenComponent} from './welcome-screen/welcome-screen.component';
+import {GameScreenComponent} from './game-screen/game-screen.component';
 
 const myFirebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -27,10 +26,35 @@ const myFirebaseConfig = {
 };
 
 const appRoutes: Routes = [
-    {path: '', pathMatch: 'full', component: AppComponent},
-    {path: 'host', component: HostScreenComponent, canActivate: [HostRouteGuard]},
-    {path: 'player', component: PlayerScreenComponent},
-    {path: 'scoreboard', component: ScoreboardScreenComponent}
+    {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: '/welcome'
+    },
+    {
+        path: 'welcome',
+        component: WelcomeScreenComponent
+    },
+    {
+        path: 'game',
+        component: GameScreenComponent,
+        children: [
+            {
+                path: 'host',
+                component: HostScreenComponent,
+                canActivate: [HostRouteGuard]
+            },
+            {
+                path: 'player',
+                component: PlayerScreenComponent
+            },
+            {
+                path: 'scoreboard',
+                component: ScoreboardScreenComponent
+            }
+        ]
+    },
+    // { path: '**', component: PageNotFoundComponent }
 ];
 
 const myFirebaseAuthConfig = {
@@ -46,8 +70,10 @@ const myFirebaseAuthConfig = {
         ScoreboardScreenComponent,
         MillisecondDatePipe,
         OrdinalPipe,
-        TitleCasePipe
-        // WaveComponent
+        TitleCasePipe,
+        WelcomeScreenComponent,
+        GameScreenComponent
+        // WaveComponent777
     ],
     imports: [
         BrowserModule,
@@ -56,7 +82,7 @@ const myFirebaseAuthConfig = {
         ButtonsModule,
         CollapseModule,
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
-        RouterModule.forRoot(appRoutes, {useHash: true})
+        RouterModule.forRoot(appRoutes)
     ],
     providers: [HostRouteGuard],
     bootstrap: [AppComponent]

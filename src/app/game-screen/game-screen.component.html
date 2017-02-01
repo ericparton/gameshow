@@ -1,0 +1,21 @@
+<nav class="navbar navbar-inverse  navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" (click)="isCollapsed = !isCollapsed">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand">{{ userName | async }}</a>
+    </div>
+    <div class="collapse navbar-collapse" [collapse]="isCollapsed">
+      <ul class="nav navbar-nav">
+        <li *ngIf="(isHost | async)" routerLinkActive="active"><a routerLink="/game/host" (click)="isCollapsed=true">Control Console</a></li>
+        <li *ngIf="!(isHost | async)" routerLinkActive="active"><a routerLink="/game/player" (click)="isCollapsed=true">Buzzer</a></li>
+        <li routerLinkActive="active"><a routerLink="/game/scoreboard" (click)="isCollapsed=true">Scoreboard</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>

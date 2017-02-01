@@ -1,10 +1,14 @@
-<div class="container-fluid below-fixed-navbar">
+<div class="container-fluid below-fixed-navbar above-fixed-navbar">
     <div class="btn-container">
-        <button [disabled]="(place | async) > 0" *ngIf="(place | async)" type="button"
+        <button [disabled]="(place | async) > 0" *ngIf="(place | async) && (isGameInProgress | async)" type="button"
                 (click)="onClick()" class="btn btn-primary btn-big">
             <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
             <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
         </button>
+        <div *ngIf="(isGameInProgress | async) === false" class="jumbotron btn-big">
+            <h1>It's over!</h1>
+            <p>The game is over for now. Come back later for more chances at victory!</p>
+        </div>
     </div>
     <div>
         <span>
@@ -12,4 +16,11 @@
         </span>
     </div>
 </div>
+<nav class="navbar navbar-inverse navbar-default navbar-fixed-bottom">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <p class="navbar-text">wut</p>
+        </div>
+    </div>
+</nav>
 

@@ -12,6 +12,7 @@ export class PlayerScreenComponent implements OnInit {
 
     public place: Observable<number>;
     public money: Observable<number>;
+    public isGameInProgress: Observable<boolean>;
 
     private uid: String;
     private question: String;
@@ -78,6 +79,8 @@ export class PlayerScreenComponent implements OnInit {
 
             return total;
         });
+
+        this.isGameInProgress = af.database.object('/isGameInProgress').map(object => object.$value);
     }
 
     ngOnInit() {
