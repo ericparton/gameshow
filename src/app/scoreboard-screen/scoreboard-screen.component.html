@@ -4,15 +4,15 @@
         <table id="list" class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th>#</th>
-                <th>Player</th>
-                <th>Points</th>
+                <th style="width:10%">#</th>
+                <th style="width:45%">Player</th>
+                <th style="width:45%">Points</th>
             </tr>
             </thead>
             <tbody>
             <tr *ngFor="let idx = index; let userPoint of userPoints | async">
                 <td>{{idx + 1}}</td>
-                <td>{{ userPoint.name }}</td>
+                <td>{{ userPoint.name | titlecase }}</td>
                 <td>{{ userPoint.points | currency:'USD':true }}</td>
             </tr>
             </tbody>
