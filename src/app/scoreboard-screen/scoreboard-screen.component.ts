@@ -41,11 +41,15 @@ export class ScoreboardScreenComponent implements OnInit {
             let questionPointsMap: Map<string,number> = new Map<string,number>();
             let userPointsList: any[] = [];
 
-            Object.keys(users).filter(key => !key.startsWith('$')).forEach(key => userPointsMap.set(key, 0));
+            // Object.keys(users).filter(key => !key.startsWith('$')).forEach(key => userPointsMap.set(key, 0));
             questions.forEach(question => questionPointsMap.set(question.$key, question.value));
 
             answers.forEach(answer => {
                 Object.keys(answer).filter(key => !key.startsWith('$')).forEach(key => {
+                    if(!userPointsMap.has(key)){
+                        userPointsMap.set(key, 0);
+                    }
+
                     let modifier: number = answer[key].correct === true ? 1 : -1;
                     let questionValue: number = questionPointsMap.get(answer.$key);
                     let userTotalPoints: number = userPointsMap.get(key) + (questionValue * modifier);
