@@ -20,7 +20,6 @@ export class ScoreboardScreenComponent implements OnInit {
     private questions: Observable<any>;
     private answers: Observable<any>;
     private users: Observable<any>;
-    private count: number;
 
     constructor(private af: AngularFire, private daterangepickerOptions: DaterangepickerConfig) {
 
@@ -54,14 +53,12 @@ export class ScoreboardScreenComponent implements OnInit {
         this.answers = this.dateRangeQuery.flatMap(query => this.af.database.list('/answersByQuestion', query));
         this.questions = this.dateRangeQuery.flatMap(query => this.af.database.list('/questions', query));
         this.users = this.af.database.object('/users');
-        this.count = 0;
 
+        /*
+         * TODO: use the join operator here when it gets added back to the BETA version of rxjs that angular 2
+         * forces you to use (???)
+         */
         Observable.combineLatest(this.answers, this.questions, this.users).subscribe(result => {
-                this.count += 1;
-
-                if (this.count != 1 && (this.count % 2) == 0) {
-                    return;
-                }
 
                 let answers = result[0];
                 let questions = result[1];
