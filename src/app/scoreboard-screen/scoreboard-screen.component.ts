@@ -1,6 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFire} from "angularfire2";
-import {Observable} from "rxjs";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
+import {DaterangepickerConfig} from 'ng2-daterangepicker';
+import * as moment from 'moment';
+import Moment = moment.Moment;
 
 @Component({
     selector: 'app-scoreboard-screen',
@@ -9,76 +12,107 @@ import {Observable} from "rxjs";
 })
 export class ScoreboardScreenComponent implements OnInit {
 
-    public userPoints: Observable<any[]>;
+    public userScores: any[];
+    public dateRange: Observable<any>;
 
-    constructor(private af: AngularFire) {
-        let date: Date = new Date();
-        date.setDate(1);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setMilliseconds(0);
+    private dateRangeSubject: Subject<any>;
+    private dateRangeQuery: Observable<any>;
+    private questions: Observable<any>;
+    private answers: Observable<any>;
+    private users: Observable<any>;
+    private count: number;
 
-        let key: string = `${date.getTime()}`;
+    constructor(private af: AngularFire, private daterangepickerOptions: DaterangepickerConfig) {
 
-        let answers = af.database.list('/answersByQuestion', {
-            query: {
-                orderByKey: true,
-                startAt: key
-            }
+        this.dateRangeSubject = new BehaviorSubject({
+            start: moment().startOf('month'),
+            end: moment().endOf('month')
         });
 
-        let questions = af.database.list('/questions', {
-            query: {
-                orderByKey: true,
-                startAt: key
+        this.dateRange = this.dateRangeSubject.asObservable();
+
+        this.daterangepickerOptions.settings = {
+            alwaysShowCalendars: false,
+            ranges: {
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('year')],
+                'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
             }
+        };
+
+        this.dateRangeQuery = this.dateRange.map(dateRange => {
+            return {
+                query: {
+                    orderByKey: true,
+                    startAt: `${dateRange.start.toDate().getTime()}`,
+                    endAt: `${dateRange.end.toDate().getTime()}`,
+                }
+            };
         });
 
-        let users = af.database.object('/users');
+        this.answers = this.dateRangeQuery.flatMap(query => this.af.database.list('/answersByQuestion', query));
+        this.questions = this.dateRangeQuery.flatMap(query => this.af.database.list('/questions', query));
+        this.users = this.af.database.object('/users');
+        this.count = 0;
 
-        this.userPoints = Observable.combineLatest(answers, questions, users, (answers, questions, users) => {
-            let userPointsMap: Map<string,number> = new Map<string,number>();
-            let questionPointsMap: Map<string,number> = new Map<string,number>();
-            let userPointsList: any[] = [];
+        Observable.combineLatest(this.answers, this.questions, this.users).subscribe(result => {
+                this.count += 1;
 
-            // Object.keys(users).filter(key => !key.startsWith('$')).forEach(key => userPointsMap.set(key, 0));
-            questions.forEach(question => questionPointsMap.set(question.$key, question.value));
-
-            answers.forEach(answer => {
-                Object.keys(answer).filter(key => !key.startsWith('$')).forEach(key => {
-                    if(!userPointsMap.has(key)){
-                        userPointsMap.set(key, 0);
-                    }
-
-                    let modifier: number = answer[key].correct === true ? 1 : -1;
-                    let questionValue: number = questionPointsMap.get(answer.$key);
-                    let userTotalPoints: number = userPointsMap.get(key) + (questionValue * modifier);
-
-                    userPointsMap.set(key, userTotalPoints);
-                })
-            });
-
-            userPointsMap.forEach((points, user) => {
-                userPointsList.push({
-                    name: users[`${user}`].name,
-                    points: points
-                })
-            });
-
-            userPointsList.sort((o1, o2) => {
-                let pointComparison: number = ScoreboardScreenComponent.compare(o2.points, o1.points);
-
-                if (pointComparison != 0) {
-                    return pointComparison;
+                if (this.count != 1 && (this.count % 2) == 0) {
+                    return;
                 }
 
-                return ScoreboardScreenComponent.compare(
-                    ScoreboardScreenComponent.getLastName(o1.name),
-                    ScoreboardScreenComponent.getLastName(o2.name));
-            });
+                let answers = result[0];
+                let questions = result[1];
+                let users = result[2];
 
-            return userPointsList;
-        });
+                let userScoreMap: Map<string,number> = new Map<string,number>();
+                let questionValueMap: Map<string,number> = new Map<string,number>();
+                let userScoreList: any[] = [];
+
+                questions.forEach(question => questionValueMap.set(question.$key, question.value));
+
+                answers.forEach(answer => {
+                    Object.keys(answer).filter(key => !key.startsWith('$')).forEach(key => {
+                        if (!userScoreMap.has(key)) {
+                            userScoreMap.set(key, 0);
+                        }
+
+                        let modifier: number = answer[key].correct === true ? 1 : -1;
+                        let questionValue: number = questionValueMap.get(answer.$key);
+                        let userTotalScore: number = userScoreMap.get(key) + (questionValue * modifier);
+
+                        userScoreMap.set(key, userTotalScore);
+                    })
+                });
+
+                userScoreMap.forEach((score, user) => {
+                    userScoreList.push({
+                        name: users[`${user}`].name,
+                        value: score
+                    })
+                });
+
+                userScoreList.sort((o1, o2) => {
+                    let scoreComparison: number = ScoreboardScreenComponent.compare(o2.value, o1.value);
+
+                    if (scoreComparison != 0) {
+                        return scoreComparison;
+                    }
+
+                    return ScoreboardScreenComponent.compare(
+                        ScoreboardScreenComponent.getLastName(o1.name),
+                        ScoreboardScreenComponent.getLastName(o2.name));
+                });
+
+                this.userScores = userScoreList;
+            }
+        );
+    }
+
+    ngOnInit() {
+
     }
 
     private static compare(o1: any, o2: any): number {
@@ -93,12 +127,15 @@ export class ScoreboardScreenComponent implements OnInit {
         }
     }
 
-    private static getLastName(name: string): string
-    {
-        let arr : string[] = name.split(' ');
+    private static getLastName(name: string): string {
+        let arr: string[] = name.split(' ');
         return arr[arr.length - 1].toUpperCase();
     }
 
-    ngOnInit() {
+    private selectedDate(value: any) {
+        this.dateRangeSubject.next({
+            start: value.start,
+            end: value.end
+        });
     }
 }

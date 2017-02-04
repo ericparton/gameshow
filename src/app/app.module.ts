@@ -16,6 +16,7 @@ import {TitleCasePipe} from "./title-case.pipe";
 import {HostRouteGuard} from "./host-screen/host-screen.guard";
 import {WelcomeScreenComponent} from './welcome-screen/welcome-screen.component';
 import {GameScreenComponent} from './game-screen/game-screen.component';
+import {Daterangepicker} from 'ng2-daterangepicker';
 
 const myFirebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -81,6 +82,7 @@ const myFirebaseAuthConfig = {
         HttpModule,
         ButtonsModule,
         CollapseModule,
+        Daterangepicker,
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
         RouterModule.forRoot(appRoutes)
     ],

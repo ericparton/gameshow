@@ -1,23 +1,35 @@
 <div class="container below-fixed-navbar">
     <h1>Scoreboard</h1>
-    <div class="table-responsive">
+    <div class="input-group datepicker" daterangepicker
+         [options]="{ startDate: (dateRange | async)?.start, endDate: (dateRange | async)?.end }"
+         (selected)="selectedDate($event)" >
+        <span class="form-control uneditable-input"  name="daterange" >
+            {{ (dateRange | async)?.start | date:'MMMM d, y' }} - {{(dateRange | async)?.end | date:'MMMM d, y' }}
+        </span>
+        <span class="input-group-btn">
+            <button class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>
+        </span>
+    </div>
+    <div *ngIf="userScores && userScores.length > 0" class="table-responsive">
         <table id="list" class="table table-bordered table-striped">
             <thead>
             <tr>
                 <th style="width:10%">#</th>
                 <th style="width:45%">Player</th>
-                <th style="width:45%">Points</th>
+                <th style="width:45%">Score</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let idx = index; let userPoint of userPoints | async">
+            <tr *ngFor="let idx = index; let userScore of userScores">
                 <td>{{idx + 1}}</td>
-                <td>{{ userPoint.name | titlecase }}</td>
-                <td [style.color]="userPoint.points < 0 ? '#d80000': 'black'">
-                    {{ userPoint.points | currency:'USD':true }}
+                <td>{{ userScore.name | titlecase }}</td>
+                <td [style.color]="userScore.value < 0 ? '#d80000': 'black'">
+                    {{ userScore.value | currency:'USD':true }}
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+    <h4 *ngIf="userScores && userScores.length < 1" >No results found</h4>
+    <div *ngIf="!userScores" class="spinner loading"></div>
 </div>
