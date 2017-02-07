@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit} from "@angular/core";
 import {FirebaseObjectObservable, AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
 import {Router} from "@angular/router";

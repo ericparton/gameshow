@@ -1,6 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {AngularFire, FirebaseObjectObservable} from "angularfire2";
+import {Component} from "@angular/core";
 import {Observable} from "rxjs";
+import {QuestionService} from "../shared/question.service";
+import {AnswerService} from "../shared/answer.service";
+import {SubmissionService} from "../shared/submission.service";
+import {UserService} from "../shared/user.service";
+import {GameService} from "../shared/game.service";
 import {isNullOrUndefined} from "util";
 
 @Component({
@@ -8,7 +12,7 @@ import {isNullOrUndefined} from "util";
     templateUrl: './host-screen.component.html',
     styleUrls: ['./host-screen.component.css']
 })
-export class HostScreenComponent implements OnInit {
+export class HostScreenComponent {
 
     public responses: Observable<any[]>;
     public users: Observable<any>;
@@ -19,33 +23,21 @@ export class HostScreenComponent implements OnInit {
     public answerModel: string[] = [];
     public gameStartedModel: boolean = false;
 
-    constructor(private af: AngularFire) {
-        this.users = af.database.object('/users');
+    constructor(private gameService: GameService,
+                private questionService: QuestionService,
+                private answerService: AnswerService,
+                private submissionService: SubmissionService,
+                private userService: UserService) {
 
-        this.isGameInProgress = af.database.object('/isGameInProgress').map(object => object.$value);
-        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
-
-        let question = af.database.list('/questions', {
-            query: {
-                orderByKey: true,
-                limitToLast: 1
-            }
-        }).filter(questions => questions.length > 0).map(questions => questions[0]);
+        let question = questionService.getLatestQuestion();
+        let answers = answerService.getAnswersByQuestion(question);
+        let submissions = submissionService.getSubmissionsByQuestion(question);
 
         question.subscribe(q => this.question = q);
 
-        let submissions = question
-            .flatMap(question => {
-                return af.database.list(`/submissionsByQuestion/${question.$key}`, {
-                    query: {
-                        orderByChild: 'submitted_on'
-                    }
-                });
-            });
-
-        let answers = question.flatMap(question => {
-            return af.database.list(`/answersByQuestion/${question.$key}`)
-        });
+        this.users = userService.getUsers();
+        this.isGameInProgress = gameService.isGameInProgress();
+        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
 
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
             let map: Map<string,boolean> = new Map<string,boolean>();
@@ -63,10 +55,7 @@ export class HostScreenComponent implements OnInit {
         });
     }
 
-    ngOnInit() {
-    }
-
-    getUser(users: any, uid: string): any {
+    public getUser(users: any, uid: string): any {
         if (users) {
             return users[uid];
         }
@@ -74,35 +63,27 @@ export class HostScreenComponent implements OnInit {
         return null
     }
 
-    onNewQuestionSubmit() {
-        let now: Date = new Date();
-
-        this.af.database.object(`/questions/${now.getTime()}`).set({
-            value: this.valueModel
-        });
-
+    public onNewQuestionSubmit(): void {
+        this.questionService.createNewQuestion(this.valueModel);
         this.valueModel = null;
     }
 
-    onGameStartedChange(gameStarted: boolean) {
-        this.af.database.object('/isGameInProgress').set(gameStarted);
-    }
-
-    onAnswerStateChange(uid: string, event: string) {
-        let answerByUser = this.af.database.object(`/answersByUser/${uid}/${this.question.$key}`);
-        let answerByQuestion = this.af.database.object(`/answersByQuestion/${this.question.$key}/${uid}`);
-
-        this.setAnswer(event, answerByUser);
-        this.setAnswer(event, answerByQuestion);
-    }
-
-    private setAnswer(correct: string, answer: FirebaseObjectObservable<any>) {
-        if (!isNullOrUndefined(correct)) {
-            let value = correct.trim().toLowerCase() === 'true';
-            answer.set({correct: value});
+    public onGameStartedChange(gameStarted: boolean): void {
+        if (gameStarted) {
+            this.gameService.startGame();
         }
         else {
-            answer.remove();
+            this.gameService.stopGame();
+        }
+    }
+
+    public onAnswerStateChange(uid: string, event: string): void {
+        if (isNullOrUndefined(event)) {
+            this.answerService.removeAnswer(uid, this.question.$key);
+        }
+        else {
+            let isCorrect: boolean = event.trim().toLowerCase() === 'true';
+            this.answerService.setAnswer(uid, this.question.$key, isCorrect);
         }
     }
 }

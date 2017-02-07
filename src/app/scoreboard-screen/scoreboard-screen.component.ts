@@ -1,8 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {AngularFire} from "angularfire2";
+import {Component} from "@angular/core";
 import {Observable, BehaviorSubject, Subject} from "rxjs";
-import {DaterangepickerConfig} from 'ng2-daterangepicker';
-import * as moment from 'moment';
+import {DaterangepickerConfig} from "ng2-daterangepicker";
+import * as moment from "moment";
+import {UserService} from "../shared/user.service";
+import Utils from "../shared/utils";
+import {AnswerService} from "../shared/answer.service";
+import {QuestionService} from "../shared/question.service";
 import Moment = moment.Moment;
 
 @Component({
@@ -10,18 +13,17 @@ import Moment = moment.Moment;
     templateUrl: './scoreboard-screen.component.html',
     styleUrls: ['./scoreboard-screen.component.css']
 })
-export class ScoreboardScreenComponent implements OnInit {
+export class ScoreboardScreenComponent {
 
     public userScores: any[];
     public dateRange: Observable<any>;
 
     private dateRangeSubject: Subject<any>;
-    private dateRangeQuery: Observable<any>;
-    private questions: Observable<any>;
-    private answers: Observable<any>;
-    private users: Observable<any>;
 
-    constructor(private af: AngularFire, private daterangepickerOptions: DaterangepickerConfig) {
+    constructor(private daterangepickerOptions: DaterangepickerConfig,
+                private userService: UserService,
+                private answerService: AnswerService,
+                private questionService: QuestionService) {
 
         this.dateRangeSubject = new BehaviorSubject({
             start: moment().startOf('month'),
@@ -40,7 +42,7 @@ export class ScoreboardScreenComponent implements OnInit {
             }
         };
 
-        this.dateRangeQuery = this.dateRange.map(dateRange => {
+        let dateRangeQuery = this.dateRange.map(dateRange => {
             return {
                 query: {
                     orderByKey: true,
@@ -50,15 +52,15 @@ export class ScoreboardScreenComponent implements OnInit {
             };
         });
 
-        this.answers = this.dateRangeQuery.flatMap(query => this.af.database.list('/answersByQuestion', query));
-        this.questions = this.dateRangeQuery.flatMap(query => this.af.database.list('/questions', query));
-        this.users = this.af.database.object('/users');
+        let answers = this.answerService.listAnswersByQuestionWithQuery(dateRangeQuery);
+        let questions = this.questionService.listQuestionsWithQuery(dateRangeQuery);
+        let users = this.userService.getUsers();
 
         /*
          * TODO: use the join operator here when it gets added back to the BETA version of rxjs that angular 2
          * forces you to use (???)
          */
-        Observable.combineLatest(this.answers, this.questions, this.users).subscribe(result => {
+        Observable.combineLatest(answers, questions, users).subscribe(result => {
 
                 let answers = result[0];
                 let questions = result[1];
@@ -92,15 +94,14 @@ export class ScoreboardScreenComponent implements OnInit {
                 });
 
                 userScoreList.sort((o1, o2) => {
-                    let scoreComparison: number = ScoreboardScreenComponent.compare(o2.value, o1.value);
+                    let scoreComparison: number = Utils.compare(o2.value, o1.value);
 
                     if (scoreComparison != 0) {
                         return scoreComparison;
                     }
-
-                    return ScoreboardScreenComponent.compare(
-                        ScoreboardScreenComponent.getLastName(o1.name),
-                        ScoreboardScreenComponent.getLastName(o2.name));
+                    else {
+                        return Utils.compare(Utils.getLastName(o1.name), Utils.getLastName(o2.name));
+                    }
                 });
 
                 this.userScores = userScoreList;
@@ -108,31 +109,7 @@ export class ScoreboardScreenComponent implements OnInit {
         );
     }
 
-    ngOnInit() {
-
-    }
-
-    private static compare(o1: any, o2: any): number {
-        if (o1 > o2) {
-            return 1;
-        }
-        else if (o1 < o2) {
-            return -1;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    private static getLastName(name: string): string {
-        let arr: string[] = name.split(' ');
-        return arr[arr.length - 1].toUpperCase();
-    }
-
-    private selectedDate(value: any) {
-        this.dateRangeSubject.next({
-            start: value.start,
-            end: value.end
-        });
+    public onDateSelection(value: any) {
+        this.dateRangeSubject.next({start: value.start, end: value.end});
     }
 }

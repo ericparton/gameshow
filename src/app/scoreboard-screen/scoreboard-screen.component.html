@@ -2,7 +2,7 @@
     <h1>Scoreboard</h1>
     <div class="input-group datepicker" daterangepicker
          [options]="{ startDate: (dateRange | async)?.start, endDate: (dateRange | async)?.end }"
-         (selected)="selectedDate($event)" >
+         (selected)="onDateSelection($event)" >
         <span class="form-control uneditable-input"  name="daterange" >
             {{ (dateRange | async)?.start | date:'MMMM d, y' }} - {{(dateRange | async)?.end | date:'MMMM d, y' }}
         </span>

@@ -1,14 +1,20 @@
-import {Component, OnInit} from '@angular/core';
-import {AngularFire} from "angularfire2";
+import {Component} from "@angular/core";
 import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
+import {QuestionService} from "../shared/question.service";
+import {GameService} from "../shared/game.service";
+import {SubmissionService} from "../shared/submission.service";
+import {AnswerService} from "../shared/answer.service";
+import {UserService} from "../shared/user.service";
+import * as moment from "moment";
+import Moment = moment.Moment;
 
 @Component({
     selector: 'app-player-screen',
     templateUrl: './player-screen.component.html',
     styleUrls: ['./player-screen.component.css']
 })
-export class PlayerScreenComponent implements OnInit {
+export class PlayerScreenComponent {
 
     public place: Observable<number>;
     public money: Observable<number>;
@@ -16,63 +22,25 @@ export class PlayerScreenComponent implements OnInit {
     public question: Observable<any>;
     public isAnswerCorrect: Observable<any>;
 
-    private uid: String;
-    private questionKey: String;
-    private month: Date;
+    private userId: string;
+    private questionKey: string;
 
-    constructor(private af: AngularFire) {
-        this.question = af.database.list('/questions', {
-            query: {
-                orderByKey: true,
-                limitToLast: 1
-            }
-        }).filter(questions => questions.length > 0).map(questions => questions[0]);
+    constructor(private questionService: QuestionService,
+                private gameService: GameService,
+                private submissionService: SubmissionService,
+                private answerService: AnswerService,
+                private userService: UserService) {
 
-        this.question.subscribe(question => {
-            this.questionKey = question.$key;
-        });
+        this.question = this.questionService.getLatestQuestion();
 
-        let uid = af.auth.map(state => state.auth.uid);
+        let startDate = moment().startOf('month').toDate();
+        let userId = this.userService.getCurrentUserId();
+        let submissions = this.submissionService.getSubmissionsByQuestion(this.question);
+        let answers = this.answerService.getAnswersByUserStartingAt(userId, startDate);
+        let questions = this.questionService.listQuestionsStartingAt(startDate);
 
-        uid.subscribe(uid => this.uid = uid);
-
-        let submissions: Observable<any[]> = this.question.flatMap(question => {
-            return af.database.list(`/submissionsByQuestion/${question.$key}`, {
-                query: {
-                    orderByChild: 'submitted_on'
-                }
-            });
-        });
-
-        this.place = Observable.combineLatest(submissions, af.auth).map(result => {
-            let submissions: any[] = result[0];
-            let uid: string = result[1].auth.uid;
-
-            for (let _i = 0; _i < submissions.length; _i++) {
-                if (submissions[_i].$key === uid) {
-                    return _i + 1;
-                }
-            }
-
-            return -1;
-        });
-
-        //TODO: use moment js here
-        this.month = new Date();
-        this.month.setDate(1);
-        this.month.setHours(0);
-        this.month.setMinutes(0);
-        this.month.setMilliseconds(0);
-
-        let query = {
-            query: {
-                orderByKey: true,
-                startAt: `${this.month.getTime()}`
-            }
-        };
-
-        let answers = uid.flatMap(uid => af.database.list(`/answersByUser/${uid}`, query));
-        let questions = af.database.list(`/questions`, query);
+        this.isAnswerCorrect = this.answerService.isAnswerCorrect(userId, this.question);
+        this.isGameInProgress = this.gameService.isGameInProgress();
 
         this.money = Observable.combineLatest(answers, questions, (answers, questions) => {
             let total: number = 0;
@@ -84,24 +52,26 @@ export class PlayerScreenComponent implements OnInit {
             return total;
         });
 
-        this.isAnswerCorrect = Observable.combineLatest(this.question, uid)
-            .flatMap(arr => af.database.object(`/answersByUser/${arr[1]}/${arr[0].$key}`))
-            .map(answer => answer.correct);
+        this.place = Observable.combineLatest(submissions, userId).map(result => {
+            let submissions: any[] = result[0];
+            let userId: string = result[1];
 
-        this.isGameInProgress = af.database.object('/isGameInProgress').map(object => object.$value);
-    }
+            for (let _i = 0; _i < submissions.length; _i++) {
+                if (submissions[_i].$key === userId) {
+                    return _i + 1;
+                }
+            }
 
-    ngOnInit() {
+            return -1;
+        });
+
+        this.question.subscribe(question => this.questionKey = question.$key);
+
+        userId.subscribe(userId => this.userId = userId);
     }
 
     onClick() {
-        let payload = {submitted_on: new Date().getTime()};
-
-        let submissionByUser = this.af.database.object(`/submissionsByUser/${this.uid}/${this.questionKey}`);
-        let submissionByQuestion = this.af.database.object(`/submissionsByQuestion/${this.questionKey}/${this.uid}`);
-
-        submissionByUser.set(payload);
-        submissionByQuestion.set(payload);
+        this.submissionService.createSubmission(this.userId, this.questionKey);
     }
 
     getColor(money: number) {
