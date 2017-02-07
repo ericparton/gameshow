@@ -41,3 +41,7 @@ h2 {
 .left-footer {
     text-align: left;
 }
+
+.jumbotron {
+    margin-bottom: 0px;
+}

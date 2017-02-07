@@ -14,6 +14,7 @@ export class PlayerScreenComponent implements OnInit {
     public money: Observable<number>;
     public isGameInProgress: Observable<boolean>;
     public question: Observable<any>;
+    public isAnswerCorrect: Observable<any>;
 
     private uid: String;
     private questionKey: String;
@@ -56,6 +57,7 @@ export class PlayerScreenComponent implements OnInit {
             return -1;
         });
 
+        //TODO: use moment js here
         this.month = new Date();
         this.month.setDate(1);
         this.month.setHours(0);
@@ -81,6 +83,10 @@ export class PlayerScreenComponent implements OnInit {
 
             return total;
         });
+
+        this.isAnswerCorrect = Observable.combineLatest(this.question, uid)
+            .flatMap(arr => af.database.object(`/answersByUser/${arr[1]}/${arr[0].$key}`))
+            .map(answer => answer.correct);
 
         this.isGameInProgress = af.database.object('/isGameInProgress').map(object => object.$value);
     }

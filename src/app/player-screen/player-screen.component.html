@@ -1,8 +1,24 @@
 <div class="container-fluid below-fixed-navbar above-fixed-navbar">
-    <button [disabled]="(place | async) > 0" *ngIf="(place | async) && (isGameInProgress | async) === true" type="button"
-            (click)="onClick()" class="btn btn-primary btn-big btn-container">
+    <button [disabled]="(place | async) > 0"
+            *ngIf="(place | async) && (isGameInProgress | async) === true
+                    && ((isAnswerCorrect | async) != true && (isAnswerCorrect | async) != false)"
+            type="button"
+            (click)="onClick()"
+            class="btn btn-primary btn-big btn-container">
         <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
         <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
+    </button>
+    <button [disabled]="(place | async) > 0"
+            *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == true"
+            type="button"
+            class="btn btn-success btn-big btn-container">
+        <i class="fa fa-check" aria-hidden="true"></i>
+    </button>
+    <button [disabled]="(place | async) > 0"
+            *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == false"
+            type="button"
+            class="btn btn-danger btn-big btn-container">
+        <i class="fa fa-times" aria-hidden="true"></i>
     </button>
     <div *ngIf="(isGameInProgress | async) === false" class="jumbotron btn-big btn-container">
         <h1>It's over!</h1>
