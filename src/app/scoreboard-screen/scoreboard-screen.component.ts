@@ -20,7 +20,7 @@ export class ScoreboardScreenComponent {
 
     private dateRangeSubject: Subject<any>;
 
-    constructor(private daterangepickerOptions: DaterangepickerConfig,
+    constructor(private dateRangePickerOptions: DaterangepickerConfig,
                 private userService: UserService,
                 private answerService: AnswerService,
                 private questionService: QuestionService) {
@@ -32,7 +32,7 @@ export class ScoreboardScreenComponent {
 
         this.dateRange = this.dateRangeSubject.asObservable();
 
-        this.daterangepickerOptions.settings = {
+        this.dateRangePickerOptions.settings = {
             alwaysShowCalendars: false,
             ranges: {
                 'This Month': [moment().startOf('month'), moment().endOf('month')],

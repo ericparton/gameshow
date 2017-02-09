@@ -23,6 +23,7 @@ export class SubmissionService {
     }
 
     public createSubmission(userId: string, questionKey: string) {
+        // let now = {".sv":"timestamp"};
         let now = new Date().getTime();
 
         let submissionDatabaseObjects = [

@@ -33,11 +33,8 @@ export class HostScreenComponent {
         let answers = answerService.getAnswersByQuestion(question);
         let submissions = submissionService.getSubmissionsByQuestion(question);
 
-        question.subscribe(q => this.question = q);
-
         this.users = userService.getUsers();
         this.isGameInProgress = gameService.isGameInProgress();
-        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
 
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
             let map: Map<string,boolean> = new Map<string,boolean>();
@@ -53,6 +50,10 @@ export class HostScreenComponent {
 
             return s1;
         });
+
+        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
+
+        question.subscribe(q => this.question = q);
     }
 
     public getUser(users: any, uid: string): any {
