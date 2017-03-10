@@ -64,6 +64,10 @@ export class HostScreenComponent {
         return null
     }
 
+    public onResetQuestion(): void {
+        this.questionService.resetLatestQuestion();
+    }
+
     public onNewQuestionSubmit(): void {
         this.questionService.createNewQuestion(this.valueModel);
         this.valueModel = null;

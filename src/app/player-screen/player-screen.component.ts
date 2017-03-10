@@ -21,6 +21,7 @@ export class PlayerScreenComponent {
     public isGameInProgress: Observable<boolean>;
     public question: Observable<any>;
     public isAnswerCorrect: Observable<any>;
+    public loading: boolean = false;
 
     private userId: string;
     private questionKey: string;
@@ -58,8 +59,13 @@ export class PlayerScreenComponent {
 
             for (let _i = 0; _i < submissions.length; _i++) {
                 if (submissions[_i].$key === userId) {
+                    this.loading = false;
                     return _i + 1;
                 }
+            }
+
+            if (submissions.length == 0) {
+                this.loading = false;
             }
 
             return -1;
@@ -71,6 +77,7 @@ export class PlayerScreenComponent {
     }
 
     onClick() {
+        this.loading = true;
         this.submissionService.createSubmission(this.userId, this.questionKey);
     }
 

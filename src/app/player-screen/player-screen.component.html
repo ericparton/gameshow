@@ -1,12 +1,13 @@
 <div class="container-fluid below-fixed-navbar above-fixed-navbar">
-    <button [disabled]="(place | async) > 0"
+    <button [disabled]="loading || (place | async) > 0"
             *ngIf="(place | async) && (isGameInProgress | async) === true
                     && ((isAnswerCorrect | async) != true && (isAnswerCorrect | async) != false)"
             type="button"
             (click)="onClick()"
             class="btn btn-primary btn-big btn-container">
-        <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
-        <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
+        <i *ngIf="loading" class="fa fa-refresh fa-spin" aria-hidden="true"></i>
+        <i *ngIf="!loading && (place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
+        <span *ngIf="!loading && (place | async) > 0" class="place">{{ place | async }}</span>
     </button>
     <button [disabled]="(place | async) > 0"
             *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == true"

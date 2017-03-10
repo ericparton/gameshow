@@ -11,6 +11,11 @@
             btnCheckbox>
         {{gameStartedModel ? 'Stop' : 'Start'}} Game
     </button>
+    <button type="button"
+            class="btn btn-lg btn-wide btn-game btn-warning"
+            (click)="onResetQuestion()">
+      Reset Question
+    </button>
     <hr />
 </div>
 <div class="container">

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AngularFire} from "angularfire2";
+import { AngularFire, FirebaseObjectObservable } from "angularfire2";
 import {Observable} from "rxjs";
 
 @Injectable()
@@ -22,17 +22,25 @@ export class SubmissionService {
         );
     }
 
-    public createSubmission(userId: string, questionKey: string) {
+    public createSubmission(userId: string, questionId: string) {
         // let now = {".sv":"timestamp"};
         let now = new Date().getTime();
 
-        let submissionDatabaseObjects = [
-            this.af.database.object(`/submissionsByUser/${userId}/${questionKey}`),
-            this.af.database.object(`/submissionsByQuestion/${questionKey}/${userId}`)
-        ];
-
-        submissionDatabaseObjects.forEach(submissionDatabaseObject => {
+        this.getSubmissionDatabaseObjects(userId, questionId).forEach(submissionDatabaseObject => {
             submissionDatabaseObject.set({submitted_on: now})
         });
+    }
+
+    public removeSubmission(userId: string, questionId: string){
+        this.getSubmissionDatabaseObjects(userId, questionId).forEach(submissionDatabaseObject => {
+            submissionDatabaseObject.remove();
+        });
+    }
+
+    private getSubmissionDatabaseObjects(userId: string, questionId: string): FirebaseObjectObservable<any>[] {
+        return [
+            this.af.database.object(`/submissionsByUser/${userId}/${questionId}`),
+            this.af.database.object(`/submissionsByQuestion/${questionId}/${userId}`)
+        ];
     }
 }
