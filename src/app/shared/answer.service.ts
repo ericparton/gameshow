@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {Observable} from "rxjs";
+import {isNullOrUndefined} from "util";
 
 @Injectable()
 export class AnswerService {
@@ -37,9 +38,15 @@ export class AnswerService {
         });
     }
 
-    public setAnswer(userId: string, questionId: string, isCorrect: boolean) {
+    public setAnswer(userId: string, questionId: string, isCorrect: boolean, wager: number = null) {
+        let answer = {correct: isCorrect};
+
+        if(!isNullOrUndefined(wager)){
+            answer['wager'] = wager;
+        }
+
         this.getAnswerDatabaseObjects(userId, questionId).forEach(answerDatabaseObject => {
-            answerDatabaseObject.set({correct: isCorrect});
+            answerDatabaseObject.set(answer);
         });
     }
 

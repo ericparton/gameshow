@@ -42,3 +42,15 @@ hr {
     width: 100%;
     margin-bottom: 10px;
 }
+
+.wager-btn {
+    width: 124px;
+}
+
+.submitted-info .form-group {
+    margin-bottom: 5px;
+}
+
+.submitted-info .form-group:last-child {
+    margin-bottom: 0px;
+}

@@ -79,7 +79,7 @@ export class ScoreboardScreenComponent {
                         }
 
                         let modifier: number = answer[key].correct === true ? 1 : -1;
-                        let questionValue: number = questionValueMap.get(answer.$key);
+                        let questionValue: number = answer[key].wager ? answer[key].wager : questionValueMap.get(answer.$key);
                         let userTotalScore: number = userScoreMap.get(key) + (questionValue * modifier);
 
                         userScoreMap.set(key, userTotalScore);

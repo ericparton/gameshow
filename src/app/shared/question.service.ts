@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { AngularFire } from "angularfire2";
-import { Observable } from "rxjs";
-import { SubmissionService } from './submission.service';
-import { AnswerService } from './answer.service';
+import {Injectable} from '@angular/core';
+import {AngularFire} from "angularfire2";
+import {Observable} from "rxjs";
+import {SubmissionService} from './submission.service';
+import {AnswerService} from './answer.service';
 
 @Injectable()
 export class QuestionService {
@@ -42,11 +42,11 @@ export class QuestionService {
     }
 
     public createNewQuestion(value: number): void {
-        let now: Date = new Date();
+        this.submitNewQuestion({value: value});
+    }
 
-        this.af.database.object(`/questions/${now.getTime()}`).set({
-            value: value
-        });
+    public createNewWagerQuestion(): void {
+        this.submitNewQuestion({wagerRequired: true});
     }
 
     public listQuestionsStartingAt(startDate: Date) {
@@ -61,5 +61,10 @@ export class QuestionService {
 
     public listQuestionsWithQuery(query: Observable<any>) {
         return query.flatMap(query => this.af.database.list('/questions', query));
+    }
+
+    private submitNewQuestion(question: any) {
+        let now: Date = new Date();
+        this.af.database.object(`/questions/${now.getTime()}`).set(question);
     }
 }

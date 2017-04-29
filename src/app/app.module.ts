@@ -4,7 +4,7 @@ import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 import {AngularFireModule, AuthProviders, AuthMethods} from "angularfire2";
 import {RouterModule, Routes} from "@angular/router";
-import {ButtonsModule, CollapseModule} from "ng2-bootstrap";
+import {ButtonsModule, CollapseModule, ModalModule} from "ng2-bootstrap";
 import {AppComponent} from "./app.component";
 import {HostScreenComponent} from "./host-screen/host-screen.component";
 import {PlayerScreenComponent} from "./player-screen/player-screen.component";
@@ -21,6 +21,7 @@ import {AnswerService} from "./shared/answer.service";
 import {SubmissionService} from "./shared/submission.service";
 import {UserService} from "./shared/user.service";
 import {GameService} from "./shared/game.service";
+import {MillisecondTimePipe} from "./shared/time-with-milliseconds.pipe";
 
 const myFirebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -74,6 +75,7 @@ const myFirebaseAuthConfig = {
         PlayerScreenComponent,
         ScoreboardScreenComponent,
         MillisecondDatePipe,
+        MillisecondTimePipe,
         OrdinalPipe,
         TitleCasePipe,
         WelcomeScreenComponent,
@@ -87,7 +89,8 @@ const myFirebaseAuthConfig = {
         CollapseModule,
         Daterangepicker,
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
-        RouterModule.forRoot(appRoutes)
+        RouterModule.forRoot(appRoutes),
+        ModalModule.forRoot()
     ],
     providers: [
         HostRouteGuard,

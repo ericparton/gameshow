@@ -1,6 +1,6 @@
 <div class="container below-fixed-navbar">
     <h1>Control Console</h1>
-    <hr />
+    <hr/>
     <button type="button"
             class="btn btn-lg btn-wide btn-game"
             [class.btn-success]="!gameStartedModel"
@@ -14,29 +14,39 @@
     <button type="button"
             class="btn btn-lg btn-wide btn-game btn-warning"
             (click)="onResetQuestion()">
-      Reset Question
+        Reset Question
     </button>
-    <hr />
+    <hr/>
 </div>
 <div class="container">
     <h2>New Question</h2>
-    <form (ngSubmit)="onNewQuestionSubmit()">
+    <form (ngSubmit)="onNewQuestionSubmit($event)">
         <div class="form-group">
             <label for="newValue">Value:</label>
-            <input class="form-control" id="newValue" type="number"
-                   placeholder="Enter question value in dollars here"
-                   [(ngModel)]="valueModel" required [ngModelOptions]="{standalone: true}">
+            <div class="input-group">
+                <div class="input-group-addon">$</div>
+                <input class="form-control" id="newValue" type="number"
+                       [disabled]="wagersEnabledModel"
+                       placeholder="Enter question value in dollars here"
+                       [(ngModel)]="valueModel" required [ngModelOptions]="{standalone: true}">
+            </div>
+            <button type="button" class="btn btn-info wager-btn submit"
+                    [(ngModel)]="wagersEnabledModel" [ngModelOptions]="{standalone: true}"
+                    btnCheckbox>
+                {{wagersEnabledModel ? 'Disable' : 'Enable'}} Wagers
+            </button>
             <button class="btn btn-primary submit" type="submit">Submit</button>
         </div>
     </form>
-    <hr />
+    <hr/>
 </div>
 <div class="container">
     <div *ngIf="question">
         <h2>Latest Question</h2>
         <div class="form-group">
             <label for="value">Value:</label>
-            <span id="value">{{question?.value | currency:"USD":true}}</span>
+            <span id="value" *ngIf="!question?.wagerRequired">{{question?.value | currency:"USD":true}}</span>
+            <span id="value" *ngIf="question?.wagerRequired">Player Specified</span>
         </div>
         <div class="form-group">
             <label for="asked">Asked:</label>
@@ -49,7 +59,7 @@
             <table id="list" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th>#</th>
+                    <th *ngIf="!question?.wagerRequired">#</th>
                     <th>Player</th>
                     <th>Submitted</th>
                     <td class="table-btn"></td>
@@ -57,18 +67,40 @@
                 </thead>
                 <tbody>
                 <tr *ngFor="let idx = index; let response of responses | async">
-                    <td>{{idx + 1}}</td>
+                    <td *ngIf="!question?.wagerRequired">{{idx + 1}}</td>
                     <td>{{ getUser((users | async),response.$key)?.name }}</td>
-                    <td>{{ response.submitted_on | millisecondsDate }}</td>
+                    <td class="submitted-info">
+                        <ng-container *ngIf="!question?.wagerRequired">
+                            {{ response.submitted_on | millisecondsDate }}
+                        </ng-container>
+                        <ng-container *ngIf="question?.wagerRequired">
+                            <div class="form-group">
+                                <label>Date:</label>
+                                <span>{{ response.submitted_on | date }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Time:</label>
+                                <span>{{ response.submitted_on | millisecondsTime }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Guess:</label>
+                                <span>{{ response.wager?.guess }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Value:</label>
+                                <span>{{ response.wager?.value | currency:"USD":true}}</span>
+                            </div>
+                        </ng-container>
+                    </td>
                     <td class="table-btn">
                         <div class="btn-group">
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager?.value)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="true" uncheckable>
                                 <i class="fa fa-check"></i>
                             </label>
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager?.value)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="false" uncheckable>
                                 <i class="fa fa-times"></i>
                             </label>

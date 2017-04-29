@@ -22,6 +22,7 @@ export class HostScreenComponent {
     public valueModel: number;
     public answerModel: string[] = [];
     public gameStartedModel: boolean = false;
+    public wagersEnabledModel: boolean = false;
 
     constructor(private gameService: GameService,
                 private questionService: QuestionService,
@@ -37,7 +38,7 @@ export class HostScreenComponent {
         this.isGameInProgress = gameService.isGameInProgress();
 
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
-            let map: Map<string,boolean> = new Map<string,boolean>();
+            let map: Map<string, boolean> = new Map<string, boolean>();
             this.answerModel = [];
 
             s2.forEach(s => map.set(s.$key, s.correct));
@@ -69,8 +70,15 @@ export class HostScreenComponent {
     }
 
     public onNewQuestionSubmit(): void {
-        this.questionService.createNewQuestion(this.valueModel);
+        if (this.wagersEnabledModel) {
+            this.questionService.createNewWagerQuestion();
+        }
+        else {
+            this.questionService.createNewQuestion(this.valueModel);
+        }
+
         this.valueModel = null;
+        this.wagersEnabledModel = false;
     }
 
     public onGameStartedChange(gameStarted: boolean): void {
@@ -82,13 +90,13 @@ export class HostScreenComponent {
         }
     }
 
-    public onAnswerStateChange(uid: string, event: string): void {
+    public onAnswerStateChange(uid: string, event: string, wagerValue: number = null): void {
         if (isNullOrUndefined(event)) {
             this.answerService.removeAnswer(uid, this.question.$key);
         }
         else {
             let isCorrect: boolean = event.trim().toLowerCase() === 'true';
-            this.answerService.setAnswer(uid, this.question.$key, isCorrect);
+            this.answerService.setAnswer(uid, this.question.$key, isCorrect, wagerValue);
         }
     }
 }

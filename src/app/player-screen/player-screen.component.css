@@ -45,3 +45,10 @@ h2 {
 .jumbotron {
     margin-bottom: 0px;
 }
+
+.guess {
+    font-size: 40px;
+    word-break: break-all;
+    white-space: normal;
+    overflow: hidden;;
+}

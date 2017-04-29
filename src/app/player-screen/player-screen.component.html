@@ -3,11 +3,17 @@
             *ngIf="(place | async) && (isGameInProgress | async) === true
                     && ((isAnswerCorrect | async) != true && (isAnswerCorrect | async) != false)"
             type="button"
-            (click)="onClick()"
+            (click)="onQuestionButtonClick()"
             class="btn btn-primary btn-big btn-container">
         <i *ngIf="loading" class="fa fa-refresh fa-spin" aria-hidden="true"></i>
         <i *ngIf="!loading && (place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
-        <span *ngIf="!loading && (place | async) > 0" class="place">{{ place | async }}</span>
+        <span *ngIf="!loading && (place | async) > 0 && !(question | async)?.wagerRequired" class="place">{{ place | async }}</span>
+        <ng-container *ngIf="!loading && (question | async)?.wagerRequired && (submission | async)?.wager">
+            <p class="guess">
+                Your Guess:<br>
+                {{(submission | async)?.wager.guess}}
+            </p>
+        </ng-container>
     </button>
     <button [disabled]="(place | async) > 0"
             *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == true"
@@ -31,8 +37,14 @@
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
                 <span *ngIf="(isGameInProgress | async) === true && (question | async)">
-                    <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-                    {{ ((question | async)?.value ? (question | async)?.value : 0) | currency:'USD':true }}
+                    <ng-container *ngIf="(question | async)?.wagerRequired && (submission | async)?.wager">
+                      <i class="fa fa-question-circle-o"></i>
+                      {{ ((submission | async)?.wager ? (submission | async)?.wager.value : 0) | currency:'USD':true }}
+                    </ng-container>
+                    <ng-container *ngIf="!(question | async)?.wagerRequired">
+                      <i class="fa fa-question-circle-o"></i>
+                      {{ ((question | async)?.value ? (question | async)?.value : 0) | currency:'USD':true }}
+                    </ng-container>
                 </span>
             </p>
             <div class=" navbar-brand right-footer">
@@ -44,4 +56,44 @@
         </div>
     </div>
 </nav>
+<div class="modal fade" bsModal #wagerModal="bs-modal" [config]="{backdrop: 'static'}" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title pull-left">Enter a wager</h4>
+                <button type="button" class="close pull-right" (click)="onWagerModalCloseClick()">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="onWagerSubmit()">
+                    <div class="form-group">
+                        <label for="guess-input" class="col-2 col-form-label" >Guess</label>
+                        <div class="col-10">
+                            <input class="form-control"
+                                   type="text"
+                                   id="guess-input"
+                                   [(ngModel)]="wagerGuessModel"
+                                   required [ngModelOptions]="{standalone: true}">
+                        </div>
+                    </div>
+                    <div class="form-group" [class.has-error]="wagerHasError">
+                        <label>Value</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">$</div>
+                            <input type="number" class="form-control"
+                                   [(ngModel)]="wagerValueModel"
+                                   (ngModelChange)="onWagerValueChange($event)"
+                                   required [ngModelOptions]="{standalone: true}">
+                        </div>
+                        <span *ngIf="wagerHasError" class="help-block">
+                            The amount of your wager cannot exceed your current score.
+                        </span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
