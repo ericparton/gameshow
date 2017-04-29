@@ -23,8 +23,8 @@ export class SubmissionService {
     }
 
     public createSubmission(userId: string, questionId: string) {
-        // let now = {".sv":"timestamp"};
-        let now = new Date().getTime();
+        let now = {".sv":"timestamp"};
+        // let now = new Date().getTime();
 
         this.getSubmissionDatabaseObjects(userId, questionId).forEach(submissionDatabaseObject => {
             submissionDatabaseObject.set({submitted_on: now})
