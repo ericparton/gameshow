@@ -7,6 +7,7 @@ import Utils from "../shared/utils";
 import {AnswerService} from "../shared/answer.service";
 import {QuestionService} from "../shared/question.service";
 import Moment = moment.Moment;
+import {isNullOrUndefined} from "util";
 
 @Component({
     selector: 'app-scoreboard-screen',
@@ -79,7 +80,7 @@ export class ScoreboardScreenComponent {
                         }
 
                         let modifier: number = answer[key].correct === true ? 1 : -1;
-                        let questionValue: number = answer[key].wager ? answer[key].wager : questionValueMap.get(answer.$key);
+                        let questionValue: number = !isNullOrUndefined(answer[key].wager) ? answer[key].wager : questionValueMap.get(answer.$key);
                         let userTotalScore: number = userScoreMap.get(key) + (questionValue * modifier);
 
                         userScoreMap.set(key, userTotalScore);

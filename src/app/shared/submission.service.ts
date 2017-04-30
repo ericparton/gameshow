@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
-import {Wager} from "./wager";
 
 @Injectable()
 export class SubmissionService {
@@ -24,18 +23,18 @@ export class SubmissionService {
         );
     }
 
-    public getSubmissionByUserAndQuestion(userId: Observable<string>, question: Observable<any>){
+    public getSubmissionByUserAndQuestion(userId: Observable<string>, question: Observable<any>) {
         return Observable.combineLatest(userId, question)
             .flatMap(arr => this.af.database.object(`/submissionsByUser/${arr[0]}/${arr[1].$key}`));
     }
 
-    public createSubmission(userId: string, questionId: string, wager: Wager = null) {
+    public createSubmission(userId: string, questionId: string, wager: number = null) {
         let now = {".sv": "timestamp"};
         // let now = new Date().getTime();
 
         let submission: any = {submitted_on: now};
 
-        if (wager) {
+        if (!isNullOrUndefined(wager)) {
             submission.wager = wager;
         }
 
@@ -47,6 +46,12 @@ export class SubmissionService {
     public removeSubmission(userId: string, questionId: string) {
         this.getSubmissionDatabaseObjects(userId, questionId).forEach(submissionDatabaseObject => {
             submissionDatabaseObject.remove();
+        });
+    }
+
+    public setSubmissionText(userId: string, questionId: string, text: string) {
+        this.getSubmissionDatabaseObjects(userId, questionId).forEach(submissionDatabaseObject => {
+            submissionDatabaseObject.update({text: text})
         });
     }
 

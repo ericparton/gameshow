@@ -82,25 +82,25 @@
                                 <label>Time:</label>
                                 <span>{{ response.submitted_on | millisecondsTime }}</span>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" *ngIf="response.text">
                                 <label>Guess:</label>
-                                <span>{{ response.wager?.guess }}</span>
+                                <span>{{ response.text }}</span>
                             </div>
                             <div class="form-group">
-                                <label>Value:</label>
-                                <span>{{ response.wager?.value | currency:"USD":true}}</span>
+                                <label>Wager:</label>
+                                <span>{{ response.wager | currency:"USD":true}}</span>
                             </div>
                         </ng-container>
                     </td>
                     <td class="table-btn">
                         <div class="btn-group">
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager?.value)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="true" uncheckable>
                                 <i class="fa fa-check"></i>
                             </label>
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager?.value)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="false" uncheckable>
                                 <i class="fa fa-times"></i>
                             </label>

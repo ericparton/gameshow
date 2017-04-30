@@ -6,7 +6,6 @@ import {GameService} from "../shared/game.service";
 import {SubmissionService} from "../shared/submission.service";
 import {AnswerService} from "../shared/answer.service";
 import {UserService} from "../shared/user.service";
-import {Wager} from "../shared/wager";
 import * as moment from "moment";
 import Moment = moment.Moment;
 
@@ -23,18 +22,23 @@ export class PlayerScreenComponent {
     public question: Observable<any>;
     public submission: Observable<any>;
     public isAnswerCorrect: Observable<any>;
-    public loading: boolean = false;
-    public wagerValueModel: number;
-    public wagerGuessModel: string;
+    public placeLoading: boolean = false;
+    public submissionLoading: boolean = false;
+    public wagerModel: number;
+    public guessModel: string;
     public scoreModel: number;
-
-    @ViewChild('wagerModal')
-    private wagerModal;
 
     private userId: string;
     private questionKey: string;
     private isWagerRequired: boolean;
     private wagerHasError: boolean;
+    private currentWager: number;
+
+    @ViewChild('wagerModal')
+    private wagerModal;
+
+    @ViewChild('guessModal')
+    private guessModal;
 
     constructor(private questionService: QuestionService,
                 private gameService: GameService,
@@ -52,6 +56,7 @@ export class PlayerScreenComponent {
 
         this.isAnswerCorrect = this.answerService.isAnswerCorrect(userId, this.question);
         this.isGameInProgress = this.gameService.isGameInProgress();
+        this.submission = this.submissionService.getSubmissionByUserAndQuestion(userId, this.question);
 
         this.money = Observable.combineLatest(answers, questions, (answers, questions) => {
             let total: number = 0;
@@ -60,7 +65,7 @@ export class PlayerScreenComponent {
             questions.forEach(question => questionValueMap.set(question.$key, question.value));
 
             answers.forEach(answer => {
-                let value = answer.wager ? answer.wager : questionValueMap.get(answer.$key);
+                let value = !isNullOrUndefined(answer.wager) ? answer.wager : questionValueMap.get(answer.$key);
                 total += (value * (answer.correct === true ? 1 : -1))
             });
 
@@ -68,21 +73,19 @@ export class PlayerScreenComponent {
             return total;
         });
 
-        this.submission = this.submissionService.getSubmissionByUserAndQuestion(userId, this.question);
-
         this.place = Observable.combineLatest(submissions, userId).map(result => {
             let submissions: any[] = result[0];
             let userId: string = result[1];
 
             for (let _i = 0; _i < submissions.length; _i++) {
                 if (submissions[_i].$key === userId) {
-                    this.loading = false;
+                    this.placeLoading = false;
                     return _i + 1;
                 }
             }
 
             if (submissions.length == 0) {
-                this.loading = false;
+                this.placeLoading = false;
             }
 
             return -1;
@@ -93,42 +96,55 @@ export class PlayerScreenComponent {
             this.isWagerRequired = question.wagerRequired;
         });
 
+        this.submission.subscribe(submission => {
+            this.submissionLoading = false;
+            this.currentWager = submission.wager;
+        });
+
         userId.subscribe(userId => this.userId = userId);
     }
 
     onQuestionButtonClick() {
         if (this.isWagerRequired) {
-            this.wagerModal.show();
+            isNullOrUndefined(this.currentWager) ? this.wagerModal.show() : this.guessModal.show();
         }
         else {
-            this.loading = true;
+            this.placeLoading = true;
             this.submissionService.createSubmission(this.userId, this.questionKey);
         }
     }
 
     onWagerSubmit() {
-        if (this.wagerValueModel > this.scoreModel) {
+        if (this.wagerModel > this.scoreModel) {
             this.wagerHasError = true;
         }
         else {
-            let wager = new Wager(this.wagerValueModel, this.wagerGuessModel);
-
-            this.loading = true;
-            this.submissionService.createSubmission(this.userId, this.questionKey, wager);
+            this.submissionLoading = true;
+            this.submissionService.createSubmission(this.userId, this.questionKey, this.wagerModel);
             this.onWagerModalCloseClick();
         }
+    }
+
+    onGuessSubmit() {
+        this.submissionLoading = true;
+        this.submissionService.setSubmissionText(this.userId, this.questionKey, this.guessModel);
+        this.onGuessModalCloseClick();
     }
 
     onWagerModalCloseClick() {
         this.wagerModal.hide();
         this.wagerHasError = false;
-        this.wagerValueModel = null;
-        this.wagerGuessModel = null;
+        this.wagerModel = null;
     }
 
-    onWagerValueChange() {
-        if(!isNullOrUndefined(this.wagerValueModel)){
-            this.wagerValueModel = Math.abs(this.wagerValueModel);
+    onGuessModalCloseClick() {
+        this.guessModal.hide();
+        this.guessModel = null;
+    }
+
+    onWagerChange() {
+        if (!isNullOrUndefined(this.wagerModel)) {
+            this.wagerModel = Math.abs(this.wagerModel);
         }
     }
 
