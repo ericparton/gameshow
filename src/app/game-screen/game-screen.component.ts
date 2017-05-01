@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild} from "@angular/core";
 import {FirebaseObjectObservable, AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
 import {Router} from "@angular/router";
@@ -13,6 +13,10 @@ export class GameScreenComponent implements OnInit {
     public isHost: Observable<boolean>;
     public userName: Observable<string>;
     public isCollapsed: boolean = true;
+    public audioPlaying: boolean = false;
+
+    @ViewChild('audioPlayer')
+    private audioPlayer;
 
     constructor(private af: AngularFire, private router: Router) {
         this.isHost = Observable.combineLatest(
@@ -50,5 +54,16 @@ export class GameScreenComponent implements OnInit {
                 this.af.auth.login();
             }
         });
+    }
+
+    toggleAudio(): void {
+        if (this.audioPlaying) {
+            this.audioPlayer.nativeElement.pause();
+        }
+        else {
+            this.audioPlayer.nativeElement.play();
+        }
+
+        this.audioPlaying = !this.audioPlaying;
     }
 }

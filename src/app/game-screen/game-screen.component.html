@@ -21,6 +21,12 @@
           <li routerLinkActive="active">
             <a routerLink="/game/scoreboard" (click)="isCollapsed=true">Scoreboard</a>
           </li>
+          <li>
+              <audio #audioPlayer loop>
+                  <source src="http://www.televisiontunes.com/uploads/audio/Jeopardy%20-%201997%20-%20Think%20Music.mp3" type="audio/mpeg">
+              </audio>
+              <a href="javascript:void(0)" (click)="isCollapsed=true;toggleAudio()">{{audioPlaying ? 'Pause' : 'Play'}} Song</a>
+          </li>
         </ul>
       </div>
     </div>
