@@ -115,7 +115,7 @@ export class PlayerScreenComponent {
     }
 
     onWagerSubmit() {
-        if (this.wagerModel > this.scoreModel) {
+        if (this.wagerModel > Math.max(this.scoreModel, 2000)) {
             this.wagerHasError = true;
         }
         else {

@@ -95,8 +95,14 @@ export class HostScreenComponent {
             this.answerService.removeAnswer(uid, this.question.$key);
         }
         else {
+            let correctedWagerValue = wagerValue;
+
+            if(!isNullOrUndefined(correctedWagerValue)){
+                correctedWagerValue = Math.abs(correctedWagerValue);
+            }
+
             let isCorrect: boolean = event.trim().toLowerCase() === 'true';
-            this.answerService.setAnswer(uid, this.question.$key, isCorrect, wagerValue);
+            this.answerService.setAnswer(uid, this.question.$key, isCorrect, correctedWagerValue);
         }
     }
 }
