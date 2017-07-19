@@ -87,7 +87,7 @@
                     <div class="form-group" [class.has-error]="wagerHasError">
                         <div class="input-group">
                             <div class="input-group-addon">$</div>
-                            <input type="number" class="form-control"
+                            <input type="number" step="0.01" class="form-control"
                                    [(ngModel)]="wagerModel"
                                    (ngModelChange)="onWagerChange($event)"
                                    required [ngModelOptions]="{standalone: true}">
