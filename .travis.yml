@@ -3,7 +3,7 @@ node_js:
 - '7'
 before_install:
   - npm i -g npm@5.0.4
-script: ng build -prod -aot
+script: ng build -prod -aot --progress false
 deploy:
   provider: firebase
   skip_cleanup: true
