@@ -5,7 +5,7 @@ import { DebugElement } from '@angular/core';
 
 import { HostScreenComponent } from './host-screen.component';
 
-describe('HostScreenComponent', () => {
+xdescribe('HostScreenComponent', () => {
   let component: HostScreenComponent;
   let fixture: ComponentFixture<HostScreenComponent>;
 

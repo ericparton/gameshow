@@ -5,7 +5,7 @@ import { DebugElement } from '@angular/core';
 
 import { GameScreenComponent } from './game-screen.component';
 
-describe('GameScreenComponent', () => {
+xdescribe('GameScreenComponent', () => {
   let component: GameScreenComponent;
   let fixture: ComponentFixture<GameScreenComponent>;
 
