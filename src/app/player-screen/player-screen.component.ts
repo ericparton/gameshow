@@ -27,18 +27,17 @@ export class PlayerScreenComponent {
     public wagerModel: number;
     public guessModel: string;
     public scoreModel: number;
-
-    private userId: string;
-    private questionKey: string;
-    private isWagerRequired: boolean;
-    private wagerHasError: boolean;
-    private currentWager: number;
+    public userId: string;
+    public questionKey: string;
+    public isWagerRequired: boolean;
+    public wagerHasError: boolean;
+    public currentWager: number;
 
     @ViewChild('wagerModal')
-    private wagerModal;
+    public wagerModal;
 
     @ViewChild('guessModal')
-    private guessModal;
+    public guessModal;
 
     constructor(private questionService: QuestionService,
                 private gameService: GameService,

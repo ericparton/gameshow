@@ -16,7 +16,7 @@ export class GameScreenComponent implements OnInit {
     public audioPlaying: boolean = false;
 
     @ViewChild('audioPlayer')
-    private audioPlayer;
+    public audioPlayer;
 
     constructor(private af: AngularFire, private router: Router) {
         this.isHost = Observable.combineLatest(
