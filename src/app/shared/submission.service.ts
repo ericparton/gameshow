@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Injectable()
 export class SubmissionService {
 
-    constructor(private af: AngularFire) {
+    constructor(private db: AngularFireDatabase) {
 
     }
 
@@ -18,14 +18,14 @@ export class SubmissionService {
         };
 
         return question.flatMap(question => {
-                return this.af.database.list(`/submissionsByQuestion/${question.$key}`, query);
+                return this.db.list(`/submissionsByQuestion/${question.$key}`, query);
             }
         );
     }
 
     public getSubmissionByUserAndQuestion(userId: Observable<string>, question: Observable<any>) {
         return Observable.combineLatest(userId, question)
-            .flatMap(arr => this.af.database.object(`/submissionsByUser/${arr[0]}/${arr[1].$key}`));
+            .flatMap(arr => this.db.object(`/submissionsByUser/${arr[0]}/${arr[1].$key}`));
     }
 
     public createSubmission(userId: string, questionId: string, wager: number = null) {
@@ -57,8 +57,8 @@ export class SubmissionService {
 
     private getSubmissionDatabaseObjects(userId: string, questionId: string): FirebaseObjectObservable<any>[] {
         return [
-            this.af.database.object(`/submissionsByUser/${userId}/${questionId}`),
-            this.af.database.object(`/submissionsByQuestion/${questionId}/${userId}`)
+            this.db.object(`/submissionsByUser/${userId}/${questionId}`),
+            this.db.object(`/submissionsByQuestion/${questionId}/${userId}`)
         ];
     }
 }

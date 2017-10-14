@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
-import {AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
+import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Injectable()
 export class UserService {
@@ -8,9 +9,9 @@ export class UserService {
     private users: Observable<any>;
     private currentUserId: Observable<string>;
 
-    constructor(private af: AngularFire) {
-        this.users = this.af.database.object('/users');
-        this.currentUserId = this.af.auth.map(state => state.auth.uid);
+    constructor(private db: AngularFireDatabase, private auth: AngularFireAuth) {
+        this.users = this.db.object('/users');
+        this.currentUserId = this.auth.authState.map(state => state.uid);
     }
 
     public getUsers() {

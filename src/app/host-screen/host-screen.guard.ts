@@ -1,16 +1,17 @@
 import {CanActivate} from '@angular/router';
 import {Injectable} from '@angular/core';
-import {AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
+import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Injectable()
 export class HostRouteGuard implements CanActivate {
 
-    constructor(private af: AngularFire) {
+    constructor(private db: AngularFireDatabase, private auth: AngularFireAuth) {
     }
 
     canActivate() {
-        return Observable.combineLatest(this.af.auth, this.af.database.object(`/hosts`), (auth, hosts) => {
+        return Observable.combineLatest(this.auth.authState, this.db.object(`/hosts`), (auth, hosts) => {
             return hosts[`${auth.uid}`] === true;
         });
     }

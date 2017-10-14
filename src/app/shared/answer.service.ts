@@ -1,18 +1,18 @@
 import {Injectable} from '@angular/core';
-import {AngularFire, FirebaseObjectObservable} from "angularfire2";
 import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Injectable()
 export class AnswerService {
 
-    constructor(private af: AngularFire) {
+    constructor(private db: AngularFireDatabase) {
 
     }
 
     public listAnswersByQuestionWithQuery(query: Observable<any>)
     {
-        return query.flatMap(query => this.af.database.list('/answersByQuestion', query));
+        return query.flatMap(query => this.db.list('/answersByQuestion', query));
     }
 
     public getAnswersByUserStartingAt(userId: Observable<string>, startDate: Date) {
@@ -23,18 +23,18 @@ export class AnswerService {
             }
         };
 
-        return userId.flatMap(userId => this.af.database.list(`/answersByUser/${userId}`, query));
+        return userId.flatMap(userId => this.db.list(`/answersByUser/${userId}`, query));
     }
 
     public isAnswerCorrect(userId: Observable<string>, question: Observable<any>) {
         return Observable.combineLatest(question, userId)
-            .flatMap(arr => this.af.database.object(`/answersByUser/${arr[1]}/${arr[0].$key}`))
+            .flatMap(arr => this.db.object(`/answersByUser/${arr[1]}/${arr[0].$key}`))
             .map(answer => answer.correct);
     };
 
     public getAnswersByQuestion(question: Observable<any>): Observable<any> {
         return question.flatMap(question => {
-            return this.af.database.list(`/answersByQuestion/${question.$key}`)
+            return this.db.list(`/answersByQuestion/${question.$key}`)
         });
     }
 
@@ -58,8 +58,8 @@ export class AnswerService {
 
     private getAnswerDatabaseObjects(userId: string, questionId: string): FirebaseObjectObservable<any>[] {
         return [
-            this.af.database.object(`/answersByUser/${userId}/${questionId}`),
-            this.af.database.object(`/answersByQuestion/${questionId}/${userId}`)
+            this.db.object(`/answersByUser/${userId}/${questionId}`),
+            this.db.object(`/answersByQuestion/${questionId}/${userId}`)
         ];
     }
 }

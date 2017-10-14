@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
-import {AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
+import { AngularFireDatabase } from 'angularfire2/database';
 
 @Injectable()
 export class GameService {
 
     private inProgress : Observable<boolean>;
 
-    constructor(private af: AngularFire) {
-        this.inProgress = af.database.object('/isGameInProgress').map(object => object.$value);
+    constructor(private db: AngularFireDatabase) {
+        this.inProgress = db.object('/isGameInProgress').map(object => object.$value);
     }
 
     public isGameInProgress()
@@ -18,11 +18,11 @@ export class GameService {
 
     public startGame()
     {
-        this.af.database.object('/isGameInProgress').set(true);
+        this.db.object('/isGameInProgress').set(true);
     }
 
     public stopGame()
     {
-        this.af.database.object('/isGameInProgress').set(false);
+        this.db.object('/isGameInProgress').set(false);
     }
 }

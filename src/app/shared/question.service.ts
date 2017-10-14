@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
 import {SubmissionService} from './submission.service';
 import {AnswerService} from './answer.service';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 @Injectable()
 export class QuestionService {
@@ -10,10 +10,10 @@ export class QuestionService {
     private latestQuestion: Observable<any>;
     private latestQuestionId: string;
 
-    constructor(private af: AngularFire,
+    constructor(private db: AngularFireDatabase,
                 private submissionService: SubmissionService,
                 private answerService: AnswerService) {
-        this.latestQuestion = af.database.list('/questions', {
+        this.latestQuestion = db.list('/questions', {
             query: {
                 orderByKey: true,
                 limitToLast: 1
@@ -50,7 +50,7 @@ export class QuestionService {
     }
 
     public listQuestionsStartingAt(startDate: Date) {
-        return this.af.database.list(`/questions`, {
+        return this.db.list(`/questions`, {
                 query: {
                     orderByKey: true,
                     startAt: `${startDate.getTime()}`
@@ -60,11 +60,11 @@ export class QuestionService {
     }
 
     public listQuestionsWithQuery(query: Observable<any>) {
-        return query.flatMap(query => this.af.database.list('/questions', query));
+        return query.flatMap(query => this.db.list('/questions', query));
     }
 
     private submitNewQuestion(question: any) {
         let now: Date = new Date();
-        this.af.database.object(`/questions/${now.getTime()}`).set(question);
+        this.db.object(`/questions/${now.getTime()}`).set(question);
     }
 }

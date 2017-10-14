@@ -1,7 +1,9 @@
 import {Component, OnInit, ViewChild} from "@angular/core";
-import {FirebaseObjectObservable, AngularFire} from "angularfire2";
 import {Observable} from "rxjs";
 import {Router} from "@angular/router";
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
 
 @Component({
     selector: 'app-game-screen',
@@ -18,28 +20,28 @@ export class GameScreenComponent implements OnInit {
     @ViewChild('audioPlayer')
     public audioPlayer;
 
-    constructor(private af: AngularFire, private router: Router) {
+    constructor(private db: AngularFireDatabase, private auth: AngularFireAuth, private router: Router) {
         this.isHost = Observable.combineLatest(
-            af.auth.map(state => state.auth.uid),
-            af.database.object('/hosts'),
+            auth.authState.map(state => state.uid),
+            db.object('/hosts'),
             (uid, hosts) => {
                 return hosts[uid] === true;
             });
 
-        this.userName = af.auth.map(state => state.auth.uid)
-            .flatMap(uid => af.database.object(`/users/${uid}`))
+        this.userName = auth.authState.map(state => state.uid)
+            .flatMap(uid => db.object(`/users/${uid}`))
             .map(user => user.name);
     }
 
     ngOnInit(): void {
         //TODO: unscramble this
-        this.af.auth.subscribe(state => {
+        this.auth.authState.subscribe(state => {
             if (state) {
-                let user: FirebaseObjectObservable<any> = this.af.database.object(`/users/${state.uid}`);
-                user.update({name: state.auth.displayName});
+                let user: FirebaseObjectObservable<any> = this.db.object(`/users/${state.uid}`);
+                user.update({name: state.displayName});
 
                 if (this.router.url !== '/game/scoreboard') {
-                    let hosts: FirebaseObjectObservable<any> = this.af.database.object(`/hosts`);
+                    let hosts: FirebaseObjectObservable<any> = this.db.object(`/hosts`);
                     hosts.subscribe(hosts => {
                         if (hosts[`${state.uid}`] === true) {
                             this.router.navigate(['/game/host']);
@@ -51,7 +53,7 @@ export class GameScreenComponent implements OnInit {
                 }
             }
             else {
-                this.af.auth.login();
+              this.auth.auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
             }
         });
     }
