@@ -23,6 +23,7 @@ export class HostScreenComponent {
     public answerModel: string[] = [];
     public gameStartedModel: boolean = false;
     public wagersEnabledModel: boolean = false;
+    public defaultValues: number[] = [200, 400, 600, 800, 1000];
 
     constructor(private gameService: GameService,
                 private questionService: QuestionService,
@@ -63,6 +64,10 @@ export class HostScreenComponent {
         }
 
         return null
+    }
+
+    public onDefaultValueSelection(value: number): void {
+        this.valueModel = value;
     }
 
     public onResetQuestion(): void {

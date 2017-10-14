@@ -4,7 +4,7 @@ import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 import {AngularFireModule, AuthProviders, AuthMethods} from "angularfire2";
 import {RouterModule, Routes} from "@angular/router";
-import {ButtonsModule, CollapseModule, ModalModule} from "ng2-bootstrap";
+import { BsDropdownModule, ButtonsModule, CollapseModule, ModalModule } from "ng2-bootstrap";
 import {AppComponent} from "./app.component";
 import {HostScreenComponent} from "./host-screen/host-screen.component";
 import {PlayerScreenComponent} from "./player-screen/player-screen.component";
@@ -88,6 +88,7 @@ const myFirebaseAuthConfig = {
         ButtonsModule,
         CollapseModule,
         Daterangepicker,
+        BsDropdownModule.forRoot(),
         AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig),
         RouterModule.forRoot(appRoutes),
         ModalModule.forRoot()

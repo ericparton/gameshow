@@ -29,6 +29,20 @@
                        [disabled]="wagersEnabledModel"
                        placeholder="Enter question value in dollars here"
                        [(ngModel)]="valueModel" required [ngModelOptions]="{standalone: true}">
+                <div class="input-group-btn" dropdown>
+                    <button dropdownToggle type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        Values <span class="caret"></span>
+                    </button>
+                    <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                        <ng-container *ngFor="let value of defaultValues">
+                            <li><a href="javascript:void(0);" (click)="onDefaultValueSelection(value)">${{value}}</a></li>
+                        </ng-container>
+                        <li role="separator" class="divider"></li>
+                        <ng-container *ngFor="let value of defaultValues">
+                            <li><a href="javascript:void(0);" (click)="onDefaultValueSelection(value*2)">${{value*2}}</a></li>
+                        </ng-container>
+                    </ul>
+                </div>
             </div>
             <button type="button" class="btn btn-info wager-btn submit"
                     [(ngModel)]="wagersEnabledModel" [ngModelOptions]="{standalone: true}"
