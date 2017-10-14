@@ -24,7 +24,14 @@ import {GameService} from "./shared/game.service";
 import {MillisecondTimePipe} from "./shared/time-with-milliseconds.pipe";
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { environment } from '../environments/environment';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
+  authDomain: "game-show-5fced.firebaseapp.com",
+  databaseURL: "https://game-show-5fced.firebaseio.com",
+  storageBucket: "game-show-5fced.appspot.com",
+  messagingSenderId: "37727258953"
+};
 
 const appRoutes: Routes = [
     {
@@ -79,7 +86,7 @@ const appRoutes: Routes = [
         CollapseModule,
         Daterangepicker,
         BsDropdownModule.forRoot(),
-        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireModule.initializeApp(firebaseConfig),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
         RouterModule.forRoot(appRoutes),
