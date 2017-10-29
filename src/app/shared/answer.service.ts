@@ -39,7 +39,11 @@ export class AnswerService {
     }
 
     public setAnswer(userId: string, questionId: string, isCorrect: boolean, wager: number = null) {
-        let answer = {correct: isCorrect};
+        let answer = {
+            user: userId,
+            question: questionId,
+            correct: isCorrect
+        };
 
         if(!isNullOrUndefined(wager)){
             answer['wager'] = wager;

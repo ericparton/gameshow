@@ -32,7 +32,11 @@ export class SubmissionService {
         let now = {".sv": "timestamp"};
         // let now = new Date().getTime();
 
-        let submission: any = {submitted_on: now};
+        let submission: any = {
+            question: questionId,
+            submitted_on: now,
+            user: userId
+        };
 
         if (!isNullOrUndefined(wager)) {
             submission.wager = wager;
