@@ -65,6 +65,7 @@ export class QuestionService {
 
     private submitNewQuestion(question: any) {
         let now: Date = new Date();
+        question['key'] = `${now.getTime()}`;
         this.db.object(`/questions/${now.getTime()}`).set(question);
     }
 }
