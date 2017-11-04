@@ -21,6 +21,7 @@
 <div class="container">
     <h2>New Question</h2>
     <form (ngSubmit)="onNewQuestionSubmit()">
+    <form (ngSubmit)="onNewQuestionSubmit()" ngNativeValidate>
         <div class="form-group">
             <label for="newValue">Value:</label>
             <div class="input-group">

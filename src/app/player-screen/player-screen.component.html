@@ -83,7 +83,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form (ngSubmit)="onWagerSubmit()">
+                <form (ngSubmit)="onWagerSubmit()" ngNativeValidate>
                     <div class="form-group" [class.has-error]="wagerHasError">
                         <div class="input-group">
                             <div class="input-group-addon">$</div>
@@ -112,7 +112,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form (ngSubmit)="onGuessSubmit()">
+                <form (ngSubmit)="onGuessSubmit()" ngNativeValidate>
                     <div class="form-group">
                         <label for="guess-input" class="col-2 col-form-label">Guess</label>
                         <div class="col-10">
