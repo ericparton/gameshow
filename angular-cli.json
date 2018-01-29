@@ -20,7 +20,7 @@
         "styles.css"
       ],
       "scripts": [
-        "../node_modules/nosleep.js/NoSleep.js"
+        "../node_modules/nosleep.js/dist/NoSleep.js"
       ],
      "environmentSource": "environments/environment.ts",
       "environments": {
