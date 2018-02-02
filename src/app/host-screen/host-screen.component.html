@@ -107,14 +107,14 @@
                         </ng-container>
                     </td>
                     <td class="table-btn">
-                        <div class="btn-group">
+                        <div class="btn-group" *ngIf="isAllowedToAnswer(idx, answerModel)">
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, idx, response.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="true" uncheckable>
                                 <i class="fa fa-check"></i>
                             </label>
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, response.wager)"
+                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, idx, response.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="false" uncheckable>
                                 <i class="fa fa-times"></i>
                             </label>

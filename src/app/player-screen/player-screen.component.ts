@@ -1,11 +1,11 @@
-import {Component, ViewChild} from "@angular/core";
-import {Observable} from "rxjs";
-import {isNullOrUndefined} from "util";
-import {QuestionService} from "../shared/question.service";
-import {GameService} from "../shared/game.service";
-import {SubmissionService} from "../shared/submission.service";
-import {AnswerService} from "../shared/answer.service";
-import {UserService} from "../shared/user.service";
+import { Component, ViewChild } from "@angular/core";
+import { Observable } from "rxjs";
+import { isNullOrUndefined } from "util";
+import { QuestionService } from "../shared/question.service";
+import { GameService } from "../shared/game.service";
+import { SubmissionService } from "../shared/submission.service";
+import { AnswerService } from "../shared/answer.service";
+import { UserService } from "../shared/user.service";
 import * as moment from "moment";
 import Moment = moment.Moment;
 
@@ -16,14 +16,14 @@ import Moment = moment.Moment;
 })
 export class PlayerScreenComponent {
 
-    public place: Observable<number>;
+    public userWhoCanAnswer: Observable<number>;
     public money: Observable<number>;
     public isGameInProgress: Observable<boolean>;
     public question: Observable<any>;
     public submission: Observable<any>;
     public isAnswerCorrect: Observable<any>;
-    public placeLoading: boolean = false;
-    public submissionLoading: boolean = false;
+    public userWhoCanAnswerLoading: boolean = true;
+    public submissionLoading: boolean = true;
     public wagerModel: number;
     public guessModel: string;
     public scoreModel: number;
@@ -50,14 +50,16 @@ export class PlayerScreenComponent {
         let startDate = moment().startOf('month').toDate();
         let userId = this.userService.getCurrentUserId();
         let submissions = this.submissionService.getSubmissionsByQuestion(this.question);
-        let answers = this.answerService.getAnswersByUserStartingAt(userId, startDate);
+        let userAnswers = this.answerService.getAnswersByUserStartingAt(userId, startDate);
+        let questionAnswers = this.answerService.getAnswersByQuestion(this.question);
         let questions = this.questionService.listQuestionsStartingAt(startDate);
+        let users = this.userService.getUsers();
 
         this.isAnswerCorrect = this.answerService.isAnswerCorrect(userId, this.question);
         this.isGameInProgress = this.gameService.isGameInProgress();
         this.submission = this.submissionService.getSubmissionByUserAndQuestion(userId, this.question);
 
-        this.money = Observable.combineLatest(answers, questions, (answers, questions) => {
+        this.money = Observable.combineLatest(userAnswers, questions, (answers, questions) => {
             let total: number = 0;
             let questionValueMap: Map<string, number> = new Map<string, number>();
 
@@ -72,22 +74,33 @@ export class PlayerScreenComponent {
             return total;
         });
 
-        this.place = Observable.combineLatest(submissions, userId).map(result => {
+        this.userWhoCanAnswer = Observable.combineLatest(submissions, questionAnswers, users).map(result => {
             let submissions: any[] = result[0];
-            let userId: string = result[1];
+            let questionAnswers: any[] = result[1];
+            let users: any[] = result[2];
+            let user: any = null;
 
-            for (let _i = 0; _i < submissions.length; _i++) {
-                if (submissions[_i].$key === userId) {
-                    this.placeLoading = false;
-                    return _i + 1;
+            let answerCorrectnessMap: Map<string, boolean> = new Map<string, boolean>();
+
+            submissions.sort((o1, o2) => {
+                return o1.submitted_on - o2.submitted_on;
+            });
+
+            questionAnswers.forEach((answer) => {
+                answerCorrectnessMap.set(answer.user, answer.correct);
+            });
+
+            for (let i = 0; i < submissions.length; i++) {
+                let submission = submissions[i];
+                let hasCorrectAnswer = answerCorrectnessMap.get(submission.user) == true;
+
+                if (hasCorrectAnswer || !answerCorrectnessMap.has(submission.user)) {
+                    user = users[submission.user];
+                    break;
                 }
             }
 
-            if (submissions.length == 0) {
-                this.placeLoading = false;
-            }
-
-            return -1;
+            return user;
         });
 
         this.question.subscribe(question => {
@@ -100,6 +113,10 @@ export class PlayerScreenComponent {
             this.currentWager = submission.wager;
         });
 
+        this.userWhoCanAnswer.subscribe( () => {
+            this.userWhoCanAnswerLoading = false;
+        });
+
         userId.subscribe(userId => this.userId = userId);
     }
 
@@ -108,7 +125,7 @@ export class PlayerScreenComponent {
             isNullOrUndefined(this.currentWager) ? this.wagerModal.show() : this.guessModal.show();
         }
         else {
-            this.placeLoading = true;
+            this.userWhoCanAnswerLoading = true;
             this.submissionService.createSubmission(this.userId, this.questionKey);
         }
     }

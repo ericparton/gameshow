@@ -1,16 +1,23 @@
 <div class="container-fluid below-fixed-navbar above-fixed-navbar">
     <button type="button"
-            [disabled]="((placeLoading || (place | async) > 0 || submissionLoading) && (question | async)?.wagerRequired !== true)
+            [disabled]="((userWhoCanAnswerLoading || (userWhoCanAnswer | async) != null || submissionLoading) && (question | async)?.wagerRequired !== true)
                     || ((question | async)?.wagerRequired === true && (submission | async)?.text)"
-            *ngIf="(submission | async) && (place | async) && (isGameInProgress | async) === true
+            *ngIf="(submission | async) && !userWhoCanAnswerLoading && (isGameInProgress | async) === true
                     && ((isAnswerCorrect | async) != true && (isAnswerCorrect | async) != false)"
             (click)="onQuestionButtonClick()"
-            class="btn btn-primary btn-big btn-container">
-        <i *ngIf="placeLoading || submissionLoading" class="fa fa-refresh fa-spin" aria-hidden="true"></i>
-        <ng-container *ngIf="!placeLoading && !submissionLoading">
+            class="btn btn-primary btn-big btn-container btn-buzzer">
+        <i *ngIf="userWhoCanAnswerLoading || submissionLoading" class="fa fa-refresh fa-spin" aria-hidden="true"></i>
+        <ng-container *ngIf="!userWhoCanAnswerLoading && !submissionLoading">
             <ng-container *ngIf="(question | async)?.wagerRequired !== true">
-                <i *ngIf="(place | async) < 0" class="fa fa-question-circle-o" aria-hidden="true"></i>
-                <span *ngIf="(place | async) > 0" class="place">{{ place | async }}</span>
+                <i *ngIf="(userWhoCanAnswer | async) == null" class="fa fa-question-circle-o" aria-hidden="true"></i>
+                <span *ngIf="(userWhoCanAnswer | async)" class="place">
+                    <ng-container *ngIf="(userWhoCanAnswer | async)?.key === userId">
+                        You!
+                    </ng-container>
+                    <ng-container *ngIf="(userWhoCanAnswer | async)?.key !== userId">
+                        {{ (userWhoCanAnswer | async)?.name }}
+                    </ng-container>
+                </span>
             </ng-container>
             <ng-container *ngIf="(question | async)?.wagerRequired">
                 <ng-container *ngIf="(submission | async)?.wager >= 0">
@@ -32,14 +39,14 @@
             </ng-container>
         </ng-container>
     </button>
-    <button [disabled]="(place | async) > 0"
-            *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == true"
+    <button [disabled]="true"
+            *ngIf="(isGameInProgress | async) === true && (isAnswerCorrect | async) == true"
             type="button"
             class="btn btn-success btn-big btn-container">
         <i class="fa fa-check" aria-hidden="true"></i>
     </button>
-    <button [disabled]="(place | async) > 0"
-            *ngIf="(place | async) && (isGameInProgress | async) === true && (isAnswerCorrect | async) == false"
+    <button [disabled]="true"
+            *ngIf="(isGameInProgress | async) === true && (isAnswerCorrect | async) == false"
             type="button"
             class="btn btn-danger btn-big btn-container">
         <i class="fa fa-times" aria-hidden="true"></i>

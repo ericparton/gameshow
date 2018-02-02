@@ -14,11 +14,11 @@ export class UserService {
         this.currentUserId = this.auth.authState.map(state => state.uid);
     }
 
-    public getUsers() {
+    public getUsers(): Observable<any> {
         return this.users;
     }
 
-    public getCurrentUserId() {
+    public getCurrentUserId(): Observable<string> {
         return this.currentUserId;
     }
 }

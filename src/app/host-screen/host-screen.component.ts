@@ -1,11 +1,11 @@
-import {Component} from "@angular/core";
-import {Observable} from "rxjs";
-import {QuestionService} from "../shared/question.service";
-import {AnswerService} from "../shared/answer.service";
-import {SubmissionService} from "../shared/submission.service";
-import {UserService} from "../shared/user.service";
-import {GameService} from "../shared/game.service";
-import {isNullOrUndefined} from "util";
+import { Component } from "@angular/core";
+import { Observable } from "rxjs";
+import { QuestionService } from "../shared/question.service";
+import { AnswerService } from "../shared/answer.service";
+import { SubmissionService } from "../shared/submission.service";
+import { UserService } from "../shared/user.service";
+import { GameService } from "../shared/game.service";
+import { isNull, isNullOrUndefined } from "util";
 
 @Component({
     selector: 'app-host-screen',
@@ -95,19 +95,33 @@ export class HostScreenComponent {
         }
     }
 
-    public onAnswerStateChange(uid: string, event: string, wagerValue: number = null): void {
+    public onAnswerStateChange(uid: string, event: string, idx: number, wagerValue: number = null): void {
         if (isNullOrUndefined(event)) {
             this.answerService.removeAnswer(uid, this.question.$key);
         }
         else {
             let correctedWagerValue = wagerValue;
 
-            if(!isNullOrUndefined(correctedWagerValue)){
+            if (!isNullOrUndefined(correctedWagerValue)) {
                 correctedWagerValue = Math.abs(correctedWagerValue);
             }
 
             let isCorrect: boolean = event.trim().toLowerCase() === 'true';
             this.answerService.setAnswer(uid, this.question.$key, isCorrect, correctedWagerValue);
+
+            if (!isCorrect && !this.question.wagerRequired) {
+                this.submissionService.getSubmissionsByQuestion(this.question).first().subscribe(submissions => {
+                    for (let i = idx + 1; i < submissions.length; i++) {
+                        if (isNullOrUndefined(this.answerModel[i])) {
+                            this.submissionService.removeSubmission(submissions[i].$key, this.question.$key)
+                        }
+                    }
+                });
+            }
         }
+    }
+
+    public isAllowedToAnswer(idx: number, answerModel: string[]) {
+        return !isNullOrUndefined(answerModel[idx]) || answerModel.findIndex(value => value === 'false') + 1 === idx;
     }
 }

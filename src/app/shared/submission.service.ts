@@ -10,14 +10,23 @@ export class SubmissionService {
 
     }
 
-    public getSubmissionsByQuestion(question: Observable<any>) {
+    public getSubmissionsByQuestion(question: Observable<any> | string) {
         let query = {
             query: {
                 orderByChild: 'submitted_on'
             }
         };
 
-        return question.flatMap(question => {
+        let questionObservable: Observable<any>;
+
+        if (question instanceof Observable) {
+            questionObservable = question;
+        }
+        else {
+            questionObservable = Observable.of(question);
+        }
+
+        return questionObservable.flatMap(question => {
                 return this.db.list(`/submissionsByQuestion/${question.$key}`, query);
             }
         );
