@@ -122,6 +122,8 @@ export class HostScreenComponent {
     }
 
     public isAllowedToAnswer(idx: number, answerModel: string[]) {
-        return !isNullOrUndefined(answerModel[idx]) || answerModel.findIndex(value => value === 'false') + 1 === idx;
+        return this.question.wagerRequired ||
+               !isNullOrUndefined(answerModel[idx]) ||
+               answerModel.findIndex(value => value === 'false') + 1 === idx;
     }
 }
