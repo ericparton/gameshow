@@ -23,7 +23,7 @@ export class HostScreenComponent {
     public answerModel: string[] = [];
     public gameStartedModel: boolean = false;
     public wagersEnabledModel: boolean = false;
-    public defaultValues: number[] = [200, 400, 600, 800, 1000];
+    public defaultValues: number[] = [200, 600, 1000];
 
     constructor(private gameService: GameService,
                 private questionService: QuestionService,
