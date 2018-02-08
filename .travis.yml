@@ -7,6 +7,8 @@ script: ng build -prod -aot --progress false
 deploy:
   provider: firebase
   skip_cleanup: true
+  on:
+    branch: master
   token:
     secure: 3/J/LmjSZqCeiQ45J9Dn1XrlA1EnqkkExyLyE8YKm8TKAOBZ++zSH8XnU/tKCYvAEco6lFBTKjyCevYqNIGUE9dzkBiSEYNun0gqJipRyTxjfWs5YQF171CzqYBXWJrchN3dlYtdNkuioIJMOI0inTLUw2Vl2jmRWgnsvdD2P8TeO+21rZxbDy+5g+jsMFadSM2o6lh4GuBzvQtGf28wd1NKoaoVhYtXnIjJwUkZ0+dfGhru712CTxxllexDsEXytu2NTkpmMgh6bSIYUqT9mjqSeJp20zTfS4uwamEEc+cxHfYAihSsB1zAnvfooAJ4szta0dWZXXGxwBy/W0yng4/5Fn4N3UzpS+cJKxDh//nK98WZtWNjjJFSJsv+glZ59eaclwPkrgDNDP7SySuxz/dmX1MyMn7Q7FoYY81IjqJ2bqAXO8FYyisyAQNahnc1HjXh0bL4f8K78epY4ZVxzpiiuxxuU6uolbr1xp5ZHwcaAmJZa00B2Cykhy1ZY5a0VXAseB2OQKJTgHzpO8ZKKrrQc1yG6sij5gmpT1hDdbQSMKtVEcGhZ5ZFtSNKxPZiHLbGkTnljsOa9CLtWHWLevbf9dpvJmDDv3cilitJGou2bivt2RCPzMUdV4CWvuSc5Dp+BUS/ZM8J4ZBI8CJNrVQeoQLtYt/bwkpok0Tf4Gk=
 notifications:
