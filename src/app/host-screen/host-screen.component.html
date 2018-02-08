@@ -73,7 +73,6 @@
             <table id="list" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th *ngIf="!question?.wagerRequired">#</th>
                     <th>Player</th>
                     <th>Submitted</th>
                     <td class="table-btn"></td>
@@ -81,7 +80,6 @@
                 </thead>
                 <tbody>
                 <tr *ngFor="let idx = index; let response of responses | async">
-                    <td *ngIf="!question?.wagerRequired">{{idx + 1}}</td>
                     <td>{{ getUser((users | async),response.$key)?.name }}</td>
                     <td class="submitted-info">
                         <ng-container *ngIf="!question?.wagerRequired">
