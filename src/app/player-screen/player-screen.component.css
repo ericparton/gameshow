@@ -31,8 +31,8 @@ h2 {
 }
 
 .place {
-    font-size: 100px;
-    line-height: 100px;
+    font-size: calc(4vw + 4vh + 2vmin);
+    word-wrap: break-word;
 }
 
 .footer > * {
