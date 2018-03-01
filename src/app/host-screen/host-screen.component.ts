@@ -5,7 +5,7 @@ import { AnswerService } from "../shared/answer.service";
 import { SubmissionService } from "../shared/submission.service";
 import { UserService } from "../shared/user.service";
 import { GameService } from "../shared/game.service";
-import { isNull, isNullOrUndefined } from "util";
+import { isNullOrUndefined } from "util";
 
 @Component({
     selector: 'app-host-screen',
@@ -21,6 +21,8 @@ export class HostScreenComponent {
     public question: any;
     public valueModel: number;
     public answerModel: string[] = [];
+    public indexOfLastAnswer: number;
+    public indexOfLastIncorrectAnswer;
     public gameStartedModel: boolean = false;
     public wagersEnabledModel: boolean = false;
     public defaultValues: number[] = [200, 600, 1000];
@@ -41,12 +43,22 @@ export class HostScreenComponent {
         this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
             let map: Map<string, boolean> = new Map<string, boolean>();
             this.answerModel = [];
+            this.indexOfLastAnswer;
+            this.indexOfLastIncorrectAnswer;
 
             s2.forEach(s => map.set(s.$key, s.correct));
 
             s1.forEach((s, i) => {
                 if (map.has(s.$key)) {
+                    let value = `${map.get(s.$key)}`;
                     this.answerModel[i] = `${map.get(s.$key)}`;
+
+                    if (!isNullOrUndefined(value)) {
+                        this.indexOfLastAnswer = i;
+                    }
+                    if (value === 'false') {
+                        this.indexOfLastIncorrectAnswer = i;
+                    }
                 }
             });
 
@@ -106,13 +118,13 @@ export class HostScreenComponent {
                 correctedWagerValue = Math.abs(correctedWagerValue);
             }
 
-            let isCorrect: boolean = event.trim().toLowerCase() === 'true';
+            let isCorrect: boolean = `${event}`.trim().toLowerCase() === 'true';
             this.answerService.setAnswer(uid, this.question.$key, isCorrect, correctedWagerValue);
 
             if (!isCorrect && !this.question.wagerRequired) {
                 this.submissionService.getSubmissionsByQuestion(this.question).first().subscribe(submissions => {
                     for (let i = idx + 1; i < submissions.length; i++) {
-                        if (isNullOrUndefined(this.answerModel[i])) {
+                        if (this.canRemoveSubmission(i)) {
                             this.submissionService.removeSubmission(submissions[i].$key, this.question.$key)
                         }
                     }
@@ -121,9 +133,39 @@ export class HostScreenComponent {
         }
     }
 
+    public canRemoveSubmission(idx: number) {
+        if (!isNullOrUndefined(this.indexOfLastAnswer) && this.indexOfLastAnswer > idx) {
+            return false;
+        }
+
+        if (isNullOrUndefined(this.answerModel[idx])) {
+            return true;
+        }
+
+        return false;
+    }
+
     public isAllowedToAnswer(idx: number, answerModel: string[]) {
-        return this.question.wagerRequired ||
-               !isNullOrUndefined(answerModel[idx]) ||
-               answerModel.findIndex(value => value === 'false') + 1 === idx;
+        if (this.question.wagerRequired) {
+            return true;
+        }
+
+        if (idx == 0 && answerModel.length == 1) {
+            return true;
+        }
+
+        if (!isNullOrUndefined(answerModel[idx])) {
+            return true;
+        }
+
+        if (isNullOrUndefined(this.indexOfLastAnswer) || this.indexOfLastAnswer > idx) {
+            return true;
+        }
+
+        if (!isNullOrUndefined(this.indexOfLastIncorrectAnswer) && this.indexOfLastIncorrectAnswer + 1 === idx) {
+            return true;
+        }
+
+        return false;
     }
 }
