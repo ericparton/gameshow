@@ -3,5 +3,4 @@ export class Answer {
     wager?: number;
     question: string;
     user: string;
-    $key: string;
 }

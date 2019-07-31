@@ -1,9 +1,11 @@
+import {combineLatest, Observable, pipe} from 'rxjs';
+import {mergeMap, map, first, tap, delay} from 'rxjs/operators';
 import {Component, OnInit, ViewChild} from "@angular/core";
-import {Observable} from "rxjs";
 import {Router} from "@angular/router";
-import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
+import {AngularFireDatabase} from "@angular/fire/database";
+import {AngularFireAuth} from "@angular/fire/auth";
+import {User} from "../shared/data/user";
 
 @Component({
     selector: 'app-game-screen',
@@ -15,34 +17,42 @@ export class GameScreenComponent implements OnInit {
     public isHost: Observable<boolean>;
     public userName: Observable<string>;
     public isCollapsed: boolean = true;
+    public isInitialized: boolean = false;
     public audioPlaying: boolean = false;
 
-    @ViewChild('audioPlayer')
+    @ViewChild('audioPlayer', { static: false })
     public audioPlayer;
 
-    constructor(private db: AngularFireDatabase, private auth: AngularFireAuth, private router: Router) {
-        this.isHost = Observable.combineLatest(
-            auth.authState.map(state => state.uid),
-            db.object('/hosts'),
-            (uid, hosts) => {
-                return hosts[uid] === true;
-            });
-
-        this.userName = auth.authState.map(state => state.uid)
-            .flatMap(uid => db.object(`/users/${uid}`))
-            .map(user => user.name);
-    }
+    constructor(private db: AngularFireDatabase, private auth: AngularFireAuth, private router: Router) {}
 
     ngOnInit(): void {
+        let uid = this.auth.authState.pipe(map(state => state.uid));
+        let hosts = this.db.object<boolean>('/hosts').valueChanges();
+
+        this.isHost = combineLatest([uid, hosts], (uid, hosts) => {
+            return hosts[uid] === true;
+        });
+
+        this.userName = this.auth.authState.pipe(
+            map(state => state.uid),
+            mergeMap(uid => this.db.object<User>(`/users/${uid}`).valueChanges()),
+            map(user => user.name)
+        );
+
+        let initializationSub = combineLatest([this.isHost, this.userName]).pipe(
+            first(),
+        ).subscribe(arr => {
+            this.isInitialized = true;
+            initializationSub.unsubscribe();
+        });
+
         //TODO: unscramble this
         this.auth.authState.subscribe(state => {
             if (state) {
-                let user: FirebaseObjectObservable<any> = this.db.object(`/users/${state.uid}`);
-                user.update({name: state.displayName});
+                this.db.object(`/users/${state.uid}`).update({name: state.displayName});
 
                 if (this.router.url !== '/game/scoreboard') {
-                    let hosts: FirebaseObjectObservable<any> = this.db.object(`/hosts`);
-                    hosts.subscribe(hosts => {
+                    this.db.object(`/hosts`).valueChanges().subscribe(hosts => {
                         if (hosts[`${state.uid}`] === true) {
                             this.router.navigate(['/game/host']);
                         }

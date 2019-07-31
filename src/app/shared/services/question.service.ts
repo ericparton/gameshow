@@ -1,10 +1,11 @@
+
+import {mergeMap, first, map, filter} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {SubmissionService} from './submission.service';
 import {AnswerService} from './answer.service';
-import { AngularFireDatabase } from 'angularfire2/database';
 import {Question} from "../data/question";
-import {FirebaseListFactoryOpts} from "angularfire2/interfaces";
+import {AngularFireDatabase} from "@angular/fire/database";
 
 @Injectable()
 export class QuestionService {
@@ -15,26 +16,24 @@ export class QuestionService {
     constructor(private db: AngularFireDatabase,
                 private submissionService: SubmissionService,
                 private answerService: AnswerService) {
-        this.latestQuestion = db.list('/questions', {
-            query: {
-                orderByKey: true,
-                limitToLast: 1
-            }
-        }).filter(questions => questions.length > 0).map(questions => questions[0]);
+        this.latestQuestion = db
+            .list<Question>('/questions', ref => ref.orderByKey().limitToLast(1))
+            .valueChanges().pipe(
+            filter(questions => questions.length > 0),map(questions => questions[0]),);
 
-        this.latestQuestion.subscribe(question => this.latestQuestionId = question.$key)
+        this.latestQuestion.subscribe(question => this.latestQuestionId = question.key)
     }
 
     public resetLatestQuestion(): void {
-        this.answerService.getAnswersByQuestion(this.latestQuestion).first().subscribe(questions => {
-            questions.forEach(question => {
-                this.answerService.removeAnswer(question.$key, this.latestQuestionId)
+        this.answerService.getAnswersByQuestion(this.latestQuestion).pipe(first()).subscribe(answers => {
+            answers.forEach(answer => {
+                this.answerService.removeAnswer(answer.user, this.latestQuestionId)
             })
         });
 
-        this.submissionService.getSubmissionsByQuestion(this.latestQuestion).first().subscribe(submissions => {
+        this.submissionService.getSubmissionsByQuestion(this.latestQuestion).pipe(first()).subscribe(submissions => {
             submissions.forEach(submission => {
-                this.submissionService.removeSubmission(submission.$key, this.latestQuestionId)
+                this.submissionService.removeSubmission(submission.user, this.latestQuestionId)
             });
         });
     }
@@ -52,22 +51,23 @@ export class QuestionService {
     }
 
     public listQuestionsStartingAt(startDate: Date): Observable<Question[]> {
-        return this.db.list(`/questions`, {
-                query: {
-                    orderByKey: true,
-                    startAt: `${startDate.getTime()}`
-                }
-            }
+        return this.db.list<Question>(`/questions`, ref => {
+            return ref.orderByKey().startAt(`${startDate.getTime()}`);
+        }).valueChanges();
+    }
+
+    public listQuestionsWithinDateRange(dateRange: Observable<Date[]>): Observable<Question[]> {
+        return dateRange.pipe(
+            mergeMap(dateRange => {
+                return this.db.list<Question>('/questions', ref => {
+                    return ref.orderByKey().startAt(`${dateRange[0].valueOf()}`).endAt(`${dateRange[1].valueOf()}`);
+                }).valueChanges();
+            })
         );
     }
 
-    public listQuestionsWithQuery(query: Observable<FirebaseListFactoryOpts>): Observable<Question[]> {
-        return query.flatMap(query => this.db.list('/questions', query));
-    }
-
-    private submitNewQuestion(question: any): void {
-        let now: Date = new Date();
-        question['key'] = `${now.getTime()}`;
-        this.db.object(`/questions/${now.getTime()}`).set(question);
+    private submitNewQuestion(question: Question): void {
+        question.key = `${new Date().getTime()}`;
+        this.db.object(`/questions/${question.key}`).set(question);
     }
 }

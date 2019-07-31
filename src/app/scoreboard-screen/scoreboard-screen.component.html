@@ -1,15 +1,37 @@
 <div class="container below-fixed-navbar">
     <h1>Scoreboard</h1>
-    <div class="input-group datepicker" daterangepicker
-         [options]="{ startDate: (dateRange | async)?.start, endDate: (dateRange | async)?.end }"
-         (selected)="onDateSelection($event)" >
-        <span class="form-control uneditable-input"  name="daterange" >
-            {{ (dateRange | async)?.start | date:'MMMM d, y' }} - {{(dateRange | async)?.end | date:'MMMM d, y' }}
-        </span>
-        <span class="input-group-btn">
-            <button class="btn btn-default"><i class="glyphicon glyphicon-calendar"></i></button>
+    <div class="input-group datepicker" >
+        <input type="text"
+               class="form-control"
+               [(ngModel)]="dateRange"
+               (ngModelChange)="onDateSelection($event)"
+               #daterangepicker="bsDaterangepicker"
+               bsDaterangepicker
+               [bsConfig]="{ rangeInputFormat: 'MMMM D, YYYY' }">
+        <span class="input-group-btn" dropdown>
+            <button class="btn btn-default" dropdownToggle aria-controls="dropdown-basic">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+                <li role="menuitem">
+                    <a class="dropdown-item" href="javascript:void(0);" (click)="onDateSelection(this.thisMonth)">This Month</a>
+                </li>
+                <li role="menuitem">
+                    <a class="dropdown-item" href="javascript:void(0);" (click)="onDateSelection(this.lastMonth)">Last Month</a>
+                </li>
+                <li role="menuitem">
+                    <a class="dropdown-item" href="javascript:void(0);" (click)="onDateSelection(this.thisYear)">This Year</a>
+                </li>
+                <li role="menuitem">
+                    <a class="dropdown-item" href="javascript:void(0);" (click)="onDateSelection(this.lastYear)">Last Year</a>
+                </li>
+                <li role="menuitem">
+                    <a class="dropdown-item" href="javascript:void(0);" (click)="daterangepicker.toggle()">Custom Range</a>
+                </li>
+            </ul>
         </span>
     </div>
+
     <div *ngIf="userScores && userScores.length > 0" class="table-responsive">
         <table id="list" class="table table-bordered table-striped">
             <thead>
@@ -24,7 +46,7 @@
                 <td>{{idx + 1}}</td>
                 <td>{{ userScore.name | titlecase }}</td>
                 <td [style.color]="userScore.value < 0 ? '#d80000': 'black'">
-                    {{ userScore.value | currency:'USD':true }}
+                    {{ userScore.value | currency:'USD':'symbol' }}
                 </td>
             </tr>
             </tbody>

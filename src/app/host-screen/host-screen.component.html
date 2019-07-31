@@ -3,13 +3,13 @@
     <hr/>
     <button type="button"
             class="btn btn-lg btn-wide btn-game"
-            [class.btn-success]="!gameStartedModel"
-            [class.btn-danger]="gameStartedModel"
-            [(ngModel)]="gameStartedModel"
+            [class.btn-success]="!isGameInProgress"
+            [class.btn-danger]="isGameInProgress"
+            [(ngModel)]="isGameInProgress"
             (ngModelChange)="onGameStartedChange($event)"
             [ngModelOptions]="{standalone: true}"
             btnCheckbox>
-        {{gameStartedModel ? 'Stop' : 'Start'}} Game
+        {{isGameInProgress ? 'Stop' : 'Start'}} Game
     </button>
     <button type="button"
             class="btn btn-lg btn-wide btn-game btn-warning"
@@ -59,15 +59,15 @@
         <h2>Latest Question</h2>
         <div class="form-group">
             <label for="value">Value:</label>
-            <span id="value" *ngIf="!question?.wagerRequired">{{question?.value | currency:"USD":true}}</span>
+            <span id="value" *ngIf="!question?.wagerRequired">{{question?.value | currency:"USD":'symbol'}}</span>
             <span id="value" *ngIf="question?.wagerRequired">Player Specified</span>
         </div>
         <div class="form-group">
             <label for="asked">Asked:</label>
-            <span id="asked">{{question?.$key | millisecondsDate}}</span>
+            <span id="asked">{{question?.key | millisecondsDate}}</span>
         </div>
     </div>
-    <div *ngIf="(responses | async)?.length > 0">
+    <div *ngIf="(submissions | async)?.length > 0">
         <label for="list">Submissions:</label>
         <div class="table-responsive">
             <table id="list" class="table table-bordered table-striped">
@@ -79,40 +79,40 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let idx = index; let response of responses | async">
-                    <td>{{ getUser((users | async),response.$key)?.name }}</td>
+                <tr *ngFor="let idx = index; let submission of submissions | async">
+                    <td>{{ getUser((users | async),submission.user)?.name }}</td>
                     <td class="submitted-info">
                         <ng-container *ngIf="!question?.wagerRequired">
-                            {{ response.submitted_on | millisecondsDate }}
+                            {{ submission.submitted_on | millisecondsDate }}
                         </ng-container>
                         <ng-container *ngIf="question?.wagerRequired">
                             <div class="form-group">
                                 <label>Date:</label>
-                                <span>{{ response.submitted_on | date }}</span>
+                                <span>{{ submission.submitted_on | date }}</span>
                             </div>
                             <div class="form-group">
                                 <label>Time:</label>
-                                <span>{{ response.submitted_on | millisecondsTime }}</span>
+                                <span>{{ submission.submitted_on | millisecondsTime }}</span>
                             </div>
-                            <div class="form-group" *ngIf="response.text">
+                            <div class="form-group" *ngIf="submission.text">
                                 <label>Guess:</label>
-                                <span>{{ response.text }}</span>
+                                <span>{{ submission.text }}</span>
                             </div>
                             <div class="form-group">
                                 <label>Wager:</label>
-                                <span>{{ response.wager | currency:"USD":true}}</span>
+                                <span>{{ submission.wager | currency:"USD":'symbol'}}</span>
                             </div>
                         </ng-container>
                     </td>
                     <td class="table-btn">
                         <div class="btn-group" *ngIf="isAllowedToAnswer(idx, answerModel)">
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, idx, response.wager)"
+                                   (ngModelChange)="onAnswerStateChange(submission.user, $event, idx, submission.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="true" uncheckable>
                                 <i class="fa fa-check"></i>
                             </label>
                             <label class="btn btn-primary"
-                                   (ngModelChange)="onAnswerStateChange(response.$key, $event, idx, response.wager)"
+                                   (ngModelChange)="onAnswerStateChange(submission.user, $event, idx, submission.wager)"
                                    [(ngModel)]="answerModel[idx]" btnRadio="false" uncheckable>
                                 <i class="fa fa-times"></i>
                             </label>

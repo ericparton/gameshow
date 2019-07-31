@@ -3,11 +3,11 @@ import {Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'ordinal'})
 export class OrdinalPipe implements PipeTransform {
 
-    private special: [string] = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth',
+    private special: string[] = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth',
         'ninth', 'tenth', 'eleventh', 'twelvth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth',
         'eighteenth', 'nineteenth'];
 
-    private deca: [string] = ['twent', 'thirt', 'fourt', 'fift', 'sixt', 'sevent', 'eight', 'ninet'];
+    private deca: string[] = ['twent', 'thirt', 'fourt', 'fift', 'sixt', 'sevent', 'eight', 'ninet'];
 
     transform(value: number): string {
         if (value < 20) {

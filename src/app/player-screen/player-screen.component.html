@@ -1,81 +1,90 @@
 <div class="container-fluid below-fixed-navbar above-fixed-navbar">
-    <button type="button"
-            [disabled]="((userWhoCanAnswerLoading || (userWhoCanAnswer | async) != null || submissionLoading) && (question | async)?.wagerRequired !== true)
-                    || ((question | async)?.wagerRequired === true && (submission | async)?.text)"
-            *ngIf="(submission | async) && !userWhoCanAnswerLoading && (isGameInProgress | async) === true
-                    && ((isAnswerCorrect | async) != true && (isAnswerCorrect | async) != false)"
-            (click)="onQuestionButtonClick()"
-            class="btn btn-primary btn-big btn-container btn-buzzer">
-        <i *ngIf="userWhoCanAnswerLoading || submissionLoading" class="fa fa-refresh fa-spin" aria-hidden="true"></i>
-        <ng-container *ngIf="!userWhoCanAnswerLoading && !submissionLoading">
-            <ng-container *ngIf="(question | async)?.wagerRequired !== true">
-                <i *ngIf="(userWhoCanAnswer | async) == null" class="fa fa-question-circle-o" aria-hidden="true"></i>
-                <span *ngIf="(userWhoCanAnswer | async)" class="place">
-                    <ng-container *ngIf="(userWhoCanAnswer | async)?.key === userId">
-                        You!
+    <ng-container *ngIf="isGameInProgress; then controls else gameOverScreen"></ng-container>
+    <ng-template #controls>
+        <button type="button"
+                *ngIf="answer == null; else answerStatus"
+                [disabled]="((userWhoCanAnswerLoading || userWhoCanAnswer || submissionLoading) && !question?.wagerRequired) || (question?.wagerRequired && submission?.text)"
+                (click)="onQuestionButtonClick()"
+                class="btn btn-primary btn-big btn-container btn-buzzer">
+            <ng-container *ngIf="(!userWhoCanAnswerLoading && !submissionLoading); else loadingSpinner">
+                <ng-container *ngIf="question?.wagerRequired; else nonWagerQuestion">
+                    <ng-container *ngIf="submission?.wager; else noWagerYet">
+                        <ng-container *ngIf="submission?.text; else noGuessYet">
+                            <p class="guess">
+                                Your Guess:<br>
+                                {{submission.text}}
+                            </p>
+                        </ng-container>
+                        <ng-template #noGuessYet>
+                            <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                        </ng-template>
                     </ng-container>
-                    <ng-container *ngIf="(userWhoCanAnswer | async)?.key !== userId">
-                        {{ (userWhoCanAnswer | async)?.name }}
-                    </ng-container>
-                </span>
-            </ng-container>
-            <ng-container *ngIf="(question | async)?.wagerRequired">
-                <ng-container *ngIf="(submission | async)?.wager >= 0">
-                    <ng-container *ngIf="!((submission | async)?.text)">
-                        <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-                    </ng-container>
-                    <ng-container *ngIf="(submission | async)?.text">
-                        <p class="guess">
-                            Your Guess:<br>
-                            {{(submission | async)?.text}}
-                        </p>
-                    </ng-container>
+                    <ng-template #noWagerYet>
+                        <ng-container *ngIf="!submission?.text">
+                            <i class="fa fa-usd" aria-hidden="true"></i>
+                        </ng-container>
+                    </ng-template>
                 </ng-container>
-                <ng-container *ngIf="!((submission | async)?.wager >= 0)">
-                    <ng-container *ngIf="!(submission | async)?.text">
-                        <i class="fa fa-usd" aria-hidden="true"></i>
-                    </ng-container>
-                </ng-container>
+                <ng-template #nonWagerQuestion>
+                    <i *ngIf="!userWhoCanAnswer" class="fa fa-question-circle-o" aria-hidden="true"></i>
+                    <span *ngIf="userWhoCanAnswer" class="place">
+                        <ng-container *ngIf="userWhoCanAnswer.key === userId; else otherUser">
+                            You!
+                        </ng-container>
+                        <ng-template #otherUser>
+                            {{ userWhoCanAnswer.name }}
+                        </ng-template>
+                    </span>
+                </ng-template>
             </ng-container>
-        </ng-container>
-    </button>
-    <button [disabled]="true"
-            *ngIf="(isGameInProgress | async) === true && (isAnswerCorrect | async) == true"
-            type="button"
-            class="btn btn-success btn-big btn-container">
-        <i class="fa fa-check" aria-hidden="true"></i>
-    </button>
-    <button [disabled]="true"
-            *ngIf="(isGameInProgress | async) === true && (isAnswerCorrect | async) == false"
-            type="button"
-            class="btn btn-danger btn-big btn-container">
-        <i class="fa fa-times" aria-hidden="true"></i>
-    </button>
-    <div *ngIf="(isGameInProgress | async) === false" class="jumbotron btn-big btn-container">
-        <h1>It's over!</h1>
-        <p>The game is over for now. Come back later for more chances at victory!</p>
-    </div>
+            <ng-template #loadingSpinner>
+                <i class="fa fa-refresh fa-spin" aria-hidden="true"></i>
+            </ng-template>
+        </button>
+        <ng-template #answerStatus>
+            <button [disabled]="true"
+                    *ngIf="answer.correct; else answerIncorrect"
+                    type="button"
+                    class="btn btn-success btn-big btn-container">
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </button>
+            <ng-template #answerIncorrect>
+                <button [disabled]="true"
+                        type="button"
+                        class="btn btn-danger btn-big btn-container">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </ng-template>
+        </ng-template>
+    </ng-template>
+    <ng-template #gameOverScreen>
+        <div class="jumbotron btn-big btn-container">
+            <h1>It's over!</h1>
+            <p>The game is over for now. Come back later for more chances at victory!</p>
+        </div>
+    </ng-template>
 </div>
+
 <nav class="navbar navbar-inverse navbar-default navbar-fixed-bottom">
     <div class="container-fluid">
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
-                <span *ngIf="(isGameInProgress | async) === true && (question | async)">
-                    <ng-container *ngIf="(question | async)?.wagerRequired && (submission | async)?.wager >= 0">
-                      <i class="fa fa-question-circle-o"></i>
-                      {{ ((submission | async)?.wager >= 0 ? (submission | async)?.wager : 0) | currency:'USD':true }}
+                <span *ngIf="isGameInProgress && question">
+                    <ng-container *ngIf="question?.wagerRequired && submission?.wager">
+                      Wager:
+                      {{ (submission?.wager ? submission?.wager : 0) | currency:'USD':'symbol' }}
                     </ng-container>
-                    <ng-container *ngIf="!(question | async)?.wagerRequired">
-                      <i class="fa fa-question-circle-o"></i>
-                      {{ ((question | async)?.value ? (question | async)?.value : 0) | currency:'USD':true }}
+                    <ng-container *ngIf="!question.wagerRequired">
+                      Question Value:
+                      {{ (question?.value ? question?.value : 0) | currency:'USD':'symbol' }}
                     </ng-container>
                 </span>
             </p>
             <div class=" navbar-brand right-footer">
-                <span [style.color]="getColor(money | async)">
-                    {{ money | async | currency:'USD':true }}
+                Current Score:
+                <span [style.color]="getColor(score)">
+                    {{ score | currency:'USD':'symbol' }}
                 </span>
-                <i class="fa fa-user-circle-o" aria-hidden="true"></i>
             </div>
         </div>
     </div>
@@ -136,4 +145,3 @@
         </div>
     </div>
 </div>
-

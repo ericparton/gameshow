@@ -1,49 +1,50 @@
+
+import {combineLatest as observableCombineLatest, of as observableOf, Observable} from 'rxjs';
+
+import {filter, mergeMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
-import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 import {Question} from "../data/question";
 import {Submission} from "../data/submission";
+import {AngularFireDatabase, AngularFireObject} from "@angular/fire/database";
 
 @Injectable()
 export class SubmissionService {
 
-    constructor(private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase) {}
 
-    }
-
-    public getSubmissionsByQuestion(question: Observable<Question> | string): Observable<Submission[]> {
-        let query = {
-            query: {
-                orderByChild: 'submitted_on'
-            }
-        };
-
-        let questionObservable: Observable<any>;
+    public getSubmissionsByQuestion(question: Observable<Question> | Question): Observable<Submission[]> {
+        let questionObservable: Observable<Question>;
 
         if (question instanceof Observable) {
             questionObservable = question;
         }
         else {
-            questionObservable = Observable.of(question);
+            questionObservable = observableOf(question);
         }
 
-        return questionObservable.flatMap(question => {
-                return this.db.list(`/submissionsByQuestion/${question.$key}`, query);
+        return questionObservable.pipe(mergeMap(question => {
+                return this.db.list<Submission>(
+                    `/submissionsByQuestion/${question.key}`,
+                    ref => ref.orderByChild('submitted_on')
+                ).valueChanges();
             }
-        );
+        ));
     }
 
     public getSubmissionByUserAndQuestion(userId: Observable<string>, question: Observable<Question>): Observable<Submission> {
-        return Observable.combineLatest(userId, question)
-            .flatMap(arr => this.db.object(`/submissionsByUser/${arr[0]}/${arr[1].$key}`));
+        return observableCombineLatest([userId, question]).pipe(
+            mergeMap(arr => {
+                return this.db.object<Submission>(`/submissionsByUser/${arr[0]}/${arr[1].key}`).valueChanges()
+            })
+        );
     }
 
     public createSubmission(userId: string, questionId: string, wager: number = null): void {
         let now = {".sv": "timestamp"};
         // let now = new Date().getTime();
 
-        let submission: any = {
+        let submission: Submission = {
             question: questionId,
             submitted_on: now,
             user: userId
@@ -70,7 +71,7 @@ export class SubmissionService {
         });
     }
 
-    private getSubmissionDatabaseObjects(userId: string, questionId: string): FirebaseObjectObservable<Submission>[] {
+    private getSubmissionDatabaseObjects(userId: string, questionId: string): AngularFireObject<Submission>[] {
         return [
             this.db.object(`/submissionsByUser/${userId}/${questionId}`),
             this.db.object(`/submissionsByQuestion/${questionId}/${userId}`)

@@ -1,4 +1,5 @@
 export class Question {
-    $key: string;
-    value: number;
+    key?: string;
+    value?: number;
+    wagerRequired?: boolean;
 }

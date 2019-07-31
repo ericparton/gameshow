@@ -9,4 +9,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule);
+//https://github.com/angular/angular/issues/23834
+platformBrowserDynamic().bootstrapModule(AppModule, {
+    preserveWhitespaces: true
+}).catch(err => console.log(err));

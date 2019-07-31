@@ -1,76 +1,99 @@
-import { Component } from "@angular/core";
-import { Observable } from "rxjs";
-import { QuestionService } from "../shared/services/question.service";
-import { AnswerService } from "../shared/services/answer.service";
-import { SubmissionService } from "../shared/services/submission.service";
-import { UserService } from "../shared/services/user.service";
-import { GameService } from "../shared/services/game.service";
-import { isNullOrUndefined } from "util";
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {first, map, takeUntil} from 'rxjs/operators';
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {QuestionService} from "../shared/services/question.service";
+import {AnswerService} from "../shared/services/answer.service";
+import {SubmissionService} from "../shared/services/submission.service";
+import {UserService} from "../shared/services/user.service";
+import {GameService} from "../shared/services/game.service";
+import {isNullOrUndefined} from "util";
+import {Question} from "../shared/data/question";
+import {User} from "../shared/data/user";
+import {Submission} from "../shared/data/submission";
 
 @Component({
     selector: 'app-host-screen',
     templateUrl: './host-screen.component.html',
     styleUrls: ['./host-screen.component.css']
 })
-export class HostScreenComponent {
+export class HostScreenComponent implements OnInit, OnDestroy {
 
-    public responses: Observable<any[]>;
-    public users: Observable<any>;
-    public isGameInProgress: Observable<boolean>;
+    public submissions: Observable<Submission[]>;
+    public users: Observable<{string: User}>;
 
-    public question: any;
+    public question: Question;
     public valueModel: number;
     public answerModel: string[] = [];
     public indexOfLastAnswer: number;
     public indexOfLastIncorrectAnswer;
-    public gameStartedModel: boolean = false;
+    public isGameInProgress: boolean = false;
     public wagersEnabledModel: boolean = false;
     public defaultValues: number[] = [200, 600, 1000];
+
+    private onDestroy: Subject<boolean>;
 
     constructor(private gameService: GameService,
                 private questionService: QuestionService,
                 private answerService: AnswerService,
                 private submissionService: SubmissionService,
-                private userService: UserService) {
+                private userService: UserService) {}
 
-        let question = questionService.getLatestQuestion();
-        let answers = answerService.getAnswersByQuestion(question);
-        let submissions = submissionService.getSubmissionsByQuestion(question);
+    public ngOnInit(): void {
+        this.onDestroy = new Subject<boolean>();
 
-        this.users = userService.getUsers();
-        this.isGameInProgress = gameService.isGameInProgress();
+        let question = this.questionService.getLatestQuestion();
+        let answers = this.answerService.getAnswersByQuestion(question);
+        let submissions = this.submissionService.getSubmissionsByQuestion(question);
 
-        this.responses = Observable.combineLatest(submissions, answers, (s1, s2) => {
-            let map: Map<string, boolean> = new Map<string, boolean>();
-            this.answerModel = [];
-            this.indexOfLastAnswer;
-            this.indexOfLastIncorrectAnswer;
+        this.users = this.userService.getUsers();
 
-            s2.forEach(s => map.set(s.$key, s.correct));
+        this.submissions = combineLatest([submissions, answers]).pipe(
+            map(array => {
+                let submissions = array[0];
+                let answers = array[1];
+                let map: Map<string, boolean> = new Map<string, boolean>();
 
-            s1.forEach((s, i) => {
-                if (map.has(s.$key)) {
-                    let value = `${map.get(s.$key)}`;
-                    this.answerModel[i] = `${map.get(s.$key)}`;
+                this.answerModel = [];
 
-                    if (!isNullOrUndefined(value)) {
-                        this.indexOfLastAnswer = i;
+                answers.forEach(answer => map.set(answer.user, answer.correct));
+
+                submissions.forEach((submission, index) => {
+                    if (map.has(submission.user)) {
+                        let value = `${map.get(submission.user)}`;
+                        this.answerModel[index] = `${map.get(submission.user)}`;
+
+                        if (!isNullOrUndefined(value)) {
+                            this.indexOfLastAnswer = index;
+                        }
+                        if (value === 'false') {
+                            this.indexOfLastIncorrectAnswer = index;
+                        }
                     }
-                    if (value === 'false') {
-                        this.indexOfLastIncorrectAnswer = i;
-                    }
-                }
-            });
+                });
 
-            return s1;
+                return submissions;
+            })
+        );
+
+        this.gameService.isGameInProgress().pipe(
+            takeUntil(this.onDestroy)
+        ).subscribe(isGameInProgress => {
+            this.isGameInProgress = isGameInProgress
         });
 
-        this.isGameInProgress.subscribe(isGameInProgress => this.gameStartedModel = isGameInProgress);
-
-        question.subscribe(q => this.question = q);
+        question.pipe(
+            takeUntil(this.onDestroy)
+        ).subscribe(question => {
+            this.question = question
+        });
     }
 
-    public getUser(users: any, uid: string): any {
+    public ngOnDestroy(): void {
+        this.onDestroy.next(true);
+        this.onDestroy.unsubscribe();
+    }
+
+    public getUser(users: any, uid: string): User {
         if (users) {
             return users[uid];
         }
@@ -89,8 +112,7 @@ export class HostScreenComponent {
     public onNewQuestionSubmit(): void {
         if (this.wagersEnabledModel) {
             this.questionService.createNewWagerQuestion();
-        }
-        else {
+        } else {
             this.questionService.createNewQuestion(this.valueModel);
         }
 
@@ -101,17 +123,15 @@ export class HostScreenComponent {
     public onGameStartedChange(gameStarted: boolean): void {
         if (gameStarted) {
             this.gameService.startGame();
-        }
-        else {
+        } else {
             this.gameService.stopGame();
         }
     }
 
     public onAnswerStateChange(uid: string, event: string, idx: number, wagerValue: number = null): void {
         if (isNullOrUndefined(event)) {
-            this.answerService.removeAnswer(uid, this.question.$key);
-        }
-        else {
+            this.answerService.removeAnswer(uid, this.question.key);
+        } else {
             let correctedWagerValue = wagerValue;
 
             if (!isNullOrUndefined(correctedWagerValue)) {
@@ -119,13 +139,13 @@ export class HostScreenComponent {
             }
 
             let isCorrect: boolean = `${event}`.trim().toLowerCase() === 'true';
-            this.answerService.setAnswer(uid, this.question.$key, isCorrect, correctedWagerValue);
+            this.answerService.setAnswer(uid, this.question.key, isCorrect, correctedWagerValue);
 
             if (!isCorrect && !this.question.wagerRequired) {
-                this.submissionService.getSubmissionsByQuestion(this.question).first().subscribe(submissions => {
+                this.submissionService.getSubmissionsByQuestion(this.question).pipe(first()).subscribe(submissions => {
                     for (let i = idx + 1; i < submissions.length; i++) {
                         if (this.canRemoveSubmission(i)) {
-                            this.submissionService.removeSubmission(submissions[i].$key, this.question.$key)
+                            this.submissionService.removeSubmission(submissions[i].user, this.question.key)
                         }
                     }
                 });

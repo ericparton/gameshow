@@ -11,13 +11,6 @@ export class MillisecondTimePipe implements PipeTransform {
         let datePipe: DatePipe = new DatePipe('en-US');
         let numValue: number = parseInt(value);
 
-        let time: string = datePipe.transform(value, 'jms');
-
-        let parts = time.split(" ");
-        return`${parts[0]}.${this.pad(numValue % 1000, 3)} ${parts[1]}`;
-    }
-
-    private pad(value, length) {
-        return (value.toString().length < length) ? this.pad("0" + value, length) : value;
+        return datePipe.transform(value, 'h:mm:ss:SSS aaa');
     }
 }

@@ -1,8 +1,9 @@
+
+import {combineLatest as observableCombineLatest, Observable} from 'rxjs';
 import {CanActivate} from '@angular/router';
 import {Injectable} from '@angular/core';
-import {Observable} from "rxjs";
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
+import {AngularFireDatabase} from "@angular/fire/database";
+import {AngularFireAuth} from "@angular/fire/auth";
 
 @Injectable()
 export class HostRouteGuard implements CanActivate {
@@ -11,7 +12,7 @@ export class HostRouteGuard implements CanActivate {
     }
 
     canActivate() {
-        return Observable.combineLatest(this.auth.authState, this.db.object(`/hosts`), (auth, hosts) => {
+        return observableCombineLatest(this.auth.authState, this.db.object(`/hosts`).valueChanges(), (auth, hosts) => {
             return hosts[`${auth.uid}`] === true;
         });
     }

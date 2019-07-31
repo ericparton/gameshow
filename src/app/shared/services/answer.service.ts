@@ -1,40 +1,50 @@
+
+import {combineLatest as observableCombineLatest, Observable} from 'rxjs';
+
+import {map, mergeMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {Observable} from "rxjs";
 import {isNullOrUndefined} from "util";
-import {AngularFireDatabase, FirebaseObjectObservable} from 'angularfire2/database';
 import {Answer} from "../data/answer";
+import {AngularFireDatabase, AngularFireObject} from "@angular/fire/database";
+import {Question} from "../data/question";
 
 @Injectable()
 export class AnswerService {
 
-    constructor(private db: AngularFireDatabase) {
-    }
+    constructor(private db: AngularFireDatabase) {}
 
-    public listAnswersByQuestionWithQuery(query: Observable<any>): Observable<Answer[]> {
-        return query.flatMap(query => this.db.list('/answersByQuestion', query));
+    public listAnswersByQuestionWithinDateRange(dateRange: Observable<Date[]>): Observable<Answer[]> {
+        return dateRange.pipe(
+            mergeMap(dateRange => {
+                return this.db.list<Answer>('/answersByQuestion', ref => {
+                    return ref.orderByKey().startAt(`${dateRange[0].valueOf()}`).endAt(`${dateRange[1].valueOf()}`);
+                }).valueChanges();
+            })
+        );
     }
 
     public getAnswersByUserStartingAt(userId: Observable<string>, startDate: Date): Observable<Answer[]> {
-        let query = {
-            query: {
-                orderByKey: true,
-                startAt: `${startDate.getTime()}`
-            }
-        };
-
-        return userId.flatMap(userId => this.db.list(`/answersByUser/${userId}`, query));
+        return userId.pipe(
+            mergeMap(userId => {
+                return this.db.list<Answer>(`/answersByUser/${userId}`, ref => {
+                    return ref.orderByKey().startAt(`${startDate.getTime()}`);
+                }).valueChanges()
+            })
+        );
     }
 
-    public isAnswerCorrect(userId: Observable<string>, question: Observable<any>): Observable<boolean> {
-        return Observable.combineLatest(question, userId)
-            .flatMap(arr => <Observable<Answer>>this.db.object(`/answersByUser/${arr[1]}/${arr[0].$key}`))
-            .map(answer => answer.correct);
+    public getAnswerByUserAndQuestion(userId: Observable<string>, question: Observable<Question>): Observable<Answer|null> {
+        return observableCombineLatest([question, userId]).pipe(
+            mergeMap(arr => this.db.object<Answer>(`/answersByUser/${arr[1]}/${arr[0].key}`).valueChanges()),
+        );
     };
 
-    public getAnswersByQuestion(question: Observable<any>): Observable<any> {
-        return question.flatMap(question => {
-            return this.db.list(`/answersByQuestion/${question.$key}`)
-        });
+    public getAnswersByQuestion(question: Observable<Question>): Observable<Answer[]> {
+        return question.pipe(
+            mergeMap(question => {
+                return this.db.list<Answer>(`/answersByQuestion/${question.key}`).valueChanges()
+            })
+        );
     }
 
     public setAnswer(userId: string, questionId: string, isCorrect: boolean, wager: number = null): void {
@@ -59,7 +69,7 @@ export class AnswerService {
         });
     }
 
-    private getAnswerDatabaseObjects(userId: string, questionId: string): FirebaseObjectObservable<any>[] {
+    private getAnswerDatabaseObjects(userId: string, questionId: string): AngularFireObject<Answer>[] {
         return [
             this.db.object(`/answersByUser/${userId}/${questionId}`),
             this.db.object(`/answersByQuestion/${questionId}/${userId}`)

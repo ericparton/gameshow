@@ -1,4 +1,5 @@
-<div *ngIf="(userName | async) != null && (isHost | async) != null">
+<ng-container *ngIf="isInitialized">
+<div>
   <nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -33,4 +34,5 @@
   </nav>
 </div>
 <router-outlet></router-outlet>
-<div *ngIf="(userName | async) == null && (isHost | async) == null" class="spinner loading"></div>
+</ng-container>
+<div *ngIf="!isInitialized" class="spinner loading"></div>
