@@ -1,10 +1,10 @@
 import { Component } from "@angular/core";
 import { Observable } from "rxjs";
-import { QuestionService } from "../shared/question.service";
-import { AnswerService } from "../shared/answer.service";
-import { SubmissionService } from "../shared/submission.service";
-import { UserService } from "../shared/user.service";
-import { GameService } from "../shared/game.service";
+import { QuestionService } from "../shared/services/question.service";
+import { AnswerService } from "../shared/services/answer.service";
+import { SubmissionService } from "../shared/services/submission.service";
+import { UserService } from "../shared/services/user.service";
+import { GameService } from "../shared/services/game.service";
 import { isNullOrUndefined } from "util";
 
 @Component({

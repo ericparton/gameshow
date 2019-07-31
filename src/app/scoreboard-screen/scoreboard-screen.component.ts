@@ -2,10 +2,10 @@ import {Component} from "@angular/core";
 import {Observable, BehaviorSubject, Subject} from "rxjs";
 import {DaterangepickerConfig} from "ng2-daterangepicker";
 import * as moment from "moment";
-import {UserService} from "../shared/user.service";
+import {UserService} from "../shared/services/user.service";
 import Utils from "../shared/utils";
-import {AnswerService} from "../shared/answer.service";
-import {QuestionService} from "../shared/question.service";
+import {AnswerService} from "../shared/services/answer.service";
+import {QuestionService} from "../shared/services/question.service";
 import Moment = moment.Moment;
 import {isNullOrUndefined} from "util";
 

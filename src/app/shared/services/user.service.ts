@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
+import {User} from "firebase/app";
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
         this.currentUserId = this.auth.authState.map(state => state.uid);
     }
 
-    public getUsers(): Observable<any> {
+    public getUsers(): Observable<User[]> {
         return this.users;
     }
 

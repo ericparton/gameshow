@@ -11,17 +11,17 @@ export class GameService {
         this.inProgress = db.object('/isGameInProgress').map(object => object.$value);
     }
 
-    public isGameInProgress()
+    public isGameInProgress(): Observable<boolean>
     {
         return this.inProgress;
     }
 
-    public startGame()
+    public startGame(): void
     {
         this.db.object('/isGameInProgress').set(true);
     }
 
-    public stopGame()
+    public stopGame(): void
     {
         this.db.object('/isGameInProgress').set(false);
     }

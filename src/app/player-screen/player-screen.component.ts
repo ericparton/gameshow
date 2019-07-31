@@ -1,11 +1,11 @@
 import { Component, ViewChild } from "@angular/core";
 import { Observable } from "rxjs";
 import { isNullOrUndefined } from "util";
-import { QuestionService } from "../shared/question.service";
-import { GameService } from "../shared/game.service";
-import { SubmissionService } from "../shared/submission.service";
-import { AnswerService } from "../shared/answer.service";
-import { UserService } from "../shared/user.service";
+import { QuestionService } from "../shared/services/question.service";
+import { GameService } from "../shared/services/game.service";
+import { SubmissionService } from "../shared/services/submission.service";
+import { AnswerService } from "../shared/services/answer.service";
+import { UserService } from "../shared/services/user.service";
 import * as moment from "moment";
 import Moment = moment.Moment;
 
