@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-- '7'
+- '12'
 before_install:
-  - npm i -g npm@5.0.4
+  - npm i -g npm@6.9.0
 script: ng build -prod -aot --progress false
 deploy:
   provider: firebase
@@ -10,7 +10,7 @@ deploy:
   on:
     branch: master
   token:
-    secure: 3/J/LmjSZqCeiQ45J9Dn1XrlA1EnqkkExyLyE8YKm8TKAOBZ++zSH8XnU/tKCYvAEco6lFBTKjyCevYqNIGUE9dzkBiSEYNun0gqJipRyTxjfWs5YQF171CzqYBXWJrchN3dlYtdNkuioIJMOI0inTLUw2Vl2jmRWgnsvdD2P8TeO+21rZxbDy+5g+jsMFadSM2o6lh4GuBzvQtGf28wd1NKoaoVhYtXnIjJwUkZ0+dfGhru712CTxxllexDsEXytu2NTkpmMgh6bSIYUqT9mjqSeJp20zTfS4uwamEEc+cxHfYAihSsB1zAnvfooAJ4szta0dWZXXGxwBy/W0yng4/5Fn4N3UzpS+cJKxDh//nK98WZtWNjjJFSJsv+glZ59eaclwPkrgDNDP7SySuxz/dmX1MyMn7Q7FoYY81IjqJ2bqAXO8FYyisyAQNahnc1HjXh0bL4f8K78epY4ZVxzpiiuxxuU6uolbr1xp5ZHwcaAmJZa00B2Cykhy1ZY5a0VXAseB2OQKJTgHzpO8ZKKrrQc1yG6sij5gmpT1hDdbQSMKtVEcGhZ5ZFtSNKxPZiHLbGkTnljsOa9CLtWHWLevbf9dpvJmDDv3cilitJGou2bivt2RCPzMUdV4CWvuSc5Dp+BUS/ZM8J4ZBI8CJNrVQeoQLtYt/bwkpok0Tf4Gk=
+    secure: ZCPIgJFqLvuNMw4UiUjWBWzZQCiy++Q0T97+PELtSfhdkmQ24D8lepuV6N9JBctbucnPJ4SOVTF1SCnPEOct6B6o07TYWrC1Zwp91kpHPU/Zw9OZ7PRLuP9LhtexGPySRNdRJ5VEchWc7O/2hnpkJEHtb+1eRA1c//f5BDgXTApydsd9zG7NhBKLzEoPZ2mTxMgQnK3PpJrPAmH6Fx517/3aySxMdOB3gLKgse19Sa/lb700zJLsxO9EVOkzPd39xOfOV5XVVDVpkEs8xKh7y/faTXnNlCnmHu61nkTEz7CUwXJoJraIs/YZJ6r6mv+3TXXrYRVUSoe/UyhPClOHvcgmgKDkYPUchfkpebQnYUJhIHaQs9dQTjrK+CL2FR925IfqUqpWegy5HhHTvaZZT/J4IR0rzYOsBSEEMhVy4LYvdvyeZucPID+mY8XFsu6CFJAL1+gvxeIRVs/GWBdOToxtmPKFehdesP5GpdEiUSPJDOGsmDWiOPLo+gLqkHEV8aZSviTI14L0SLzwNlHmLo/TLksPQ78kHl6hh9K9ObtPZvbEZvZNPmu3I1KhyE64wavoPOJA3K2KUP+dAvZ+o6NsWlio+Hvi8+ndrQ6qEoKWcVFjaYivjUvMhpIlJXPL/b8UhlcSje7Sw/83Rl37PQ8MovMMRq8K5u5tZJSBKPY=
 notifications:
   email:
     on_success: always
