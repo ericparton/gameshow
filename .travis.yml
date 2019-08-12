@@ -3,7 +3,7 @@ node_js:
 - '12'
 before_install:
   - npm i -g npm@6.9.0
-script: ng build -prod -aot --progress false
+script: ng run gameshow:build:production --progress=false
 deploy:
   provider: firebase
   skip_cleanup: true
