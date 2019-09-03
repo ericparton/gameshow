@@ -71,20 +71,20 @@
             <p class="navbar-brand left-footer">
                 <span *ngIf="isGameInProgress && question">
                     <ng-container *ngIf="question?.wagerRequired && submission?.wager">
-                      Wager:
+                      <i class="fa fa-question-circle-o"></i>
                       {{ (submission?.wager ? submission?.wager : 0) | currency:'USD':'symbol' }}
                     </ng-container>
                     <ng-container *ngIf="!question.wagerRequired">
-                      Question Value:
+                      <i class="fa fa-question-circle-o"></i>
                       {{ (question?.value ? question?.value : 0) | currency:'USD':'symbol' }}
                     </ng-container>
                 </span>
             </p>
             <div class=" navbar-brand right-footer">
-                Current Score:
                 <span [style.color]="getColor(score)">
                     {{ score | currency:'USD':'symbol' }}
                 </span>
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i>
             </div>
         </div>
     </div>
