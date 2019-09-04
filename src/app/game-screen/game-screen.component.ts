@@ -46,24 +46,18 @@ export class GameScreenComponent implements OnInit {
             initializationSub.unsubscribe();
         });
 
-        //TODO: unscramble this
         this.auth.authState.subscribe(state => {
-            if (state) {
-                this.db.object(`/users/${state.uid}`).update({name: state.displayName});
+            this.db.object(`/users/${state.uid}`).update({name: state.displayName});
 
-                if (this.router.url !== '/game/scoreboard') {
-                    this.db.object(`/hosts`).valueChanges().subscribe(hosts => {
-                        if (hosts[`${state.uid}`] === true) {
-                            this.router.navigate(['/game/host']);
-                        }
-                        else {
-                            this.router.navigate(['/game/player']);
-                        }
-                    });
-                }
-            }
-            else {
-              this.auth.auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+            if (this.router.url !== '/game/scoreboard') {
+                this.db.object(`/hosts`).valueChanges().subscribe(hosts => {
+                    if (hosts[`${state.uid}`] === true) {
+                        this.router.navigate(['/game/host']);
+                    }
+                    else {
+                        this.router.navigate(['/game/player']);
+                    }
+                });
             }
         });
     }

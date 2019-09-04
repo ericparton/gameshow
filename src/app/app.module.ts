@@ -24,6 +24,9 @@ import {AngularFireAuthModule} from "@angular/fire/auth";
 import {AngularFireModule} from "@angular/fire";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {BsDatepickerModule} from 'ngx-bootstrap/datepicker';
+import {AuthorizationGuard} from "./shared/authorization.guard";
+import {WakeLockService} from "./shared/services/wake-lock.service";
+import {WakeLockGuard} from "./shared/wake-lock.guard";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -46,6 +49,7 @@ const appRoutes: Routes = [
     {
         path: 'game',
         component: GameScreenComponent,
+        canActivate: [AuthorizationGuard, WakeLockGuard],
         children: [
             {
                 path: 'host',
@@ -95,11 +99,14 @@ const appRoutes: Routes = [
     ],
     providers: [
         HostRouteGuard,
+        AuthorizationGuard,
         QuestionService,
         AnswerService,
         SubmissionService,
         UserService,
-        GameService
+        GameService,
+        WakeLockService,
+        WakeLockGuard
     ],
     bootstrap: [AppComponent]
 })

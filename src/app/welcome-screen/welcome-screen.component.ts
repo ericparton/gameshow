@@ -1,4 +1,6 @@
 import {Component, OnInit} from '@angular/core';
+import {WakeLockService} from "../shared/services/wake-lock.service";
+import {Router} from "@angular/router";
 
 declare var NoSleep: any;
 
@@ -11,7 +13,7 @@ export class WelcomeScreenComponent implements OnInit {
 
     public noSleep: any;
 
-    constructor() {
+    constructor(private wakeLockService: WakeLockService, private router: Router) {
         this.noSleep = new NoSleep();
     }
 
@@ -20,6 +22,8 @@ export class WelcomeScreenComponent implements OnInit {
 
         document.querySelector("#startButton").addEventListener('click', function () {
             _this.noSleep.enable();
+            _this.wakeLockService.setWakeLockEnabled(true);
+            _this.router.navigate(['/game']);
         }, false);
     }
 }
