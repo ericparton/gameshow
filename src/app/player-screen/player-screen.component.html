@@ -8,7 +8,7 @@
                 class="btn btn-primary btn-big btn-container btn-buzzer">
             <ng-container *ngIf="(!userWhoCanAnswerLoading && !submissionLoading); else loadingSpinner">
                 <ng-container *ngIf="question?.wagerRequired; else nonWagerQuestion">
-                    <ng-container *ngIf="submission?.wager; else noWagerYet">
+                    <ng-container *ngIf="submission?.wager != null; else noWagerYet">
                         <ng-container *ngIf="submission?.text; else noGuessYet">
                             <p class="guess">
                                 Your Guess:<br>
@@ -70,7 +70,7 @@
         <div class="navbar-header footer">
             <p class="navbar-brand left-footer">
                 <span *ngIf="isGameInProgress && question">
-                    <ng-container *ngIf="question?.wagerRequired && submission?.wager">
+                    <ng-container *ngIf="question?.wagerRequired && submission?.wager != null">
                       <i class="fa fa-question-circle-o"></i>
                       {{ (submission?.wager ? submission?.wager : 0) | currency:'USD':'symbol' }}
                     </ng-container>
