@@ -10,6 +10,7 @@ import {isNullOrUndefined} from "util";
 import {Question} from "../shared/data/question";
 import {User} from "../shared/data/user";
 import {Submission} from "../shared/data/submission";
+import {LightService} from "../shared/services/light.service";
 
 @Component({
     selector: 'app-host-screen',
@@ -19,7 +20,7 @@ import {Submission} from "../shared/data/submission";
 export class HostScreenComponent implements OnInit, OnDestroy {
 
     public submissions: Observable<Submission[]>;
-    public users: Observable<{string: User}>;
+    public users: Observable<{ string: User }>;
 
     public question: Question;
     public valueModel: number;
@@ -36,7 +37,9 @@ export class HostScreenComponent implements OnInit, OnDestroy {
                 private questionService: QuestionService,
                 private answerService: AnswerService,
                 private submissionService: SubmissionService,
-                private userService: UserService) {}
+                private userService: UserService,
+                private lightService: LightService) {
+    }
 
     public ngOnInit(): void {
         this.onDestroy = new Subject<boolean>();
@@ -141,6 +144,12 @@ export class HostScreenComponent implements OnInit, OnDestroy {
             let isCorrect: boolean = `${event}`.trim().toLowerCase() === 'true';
             this.answerService.setAnswer(uid, this.question.key, isCorrect, correctedWagerValue);
 
+            if (isCorrect) {
+                this.lightService.blinkGreen();
+            } else {
+                this.lightService.blinkRed();
+            }
+
             if (!isCorrect && !this.question.wagerRequired) {
                 this.submissionService.getSubmissionsByQuestion(this.question).pipe(first()).subscribe(submissions => {
                     for (let i = idx + 1; i < submissions.length; i++) {
@@ -183,6 +192,10 @@ export class HostScreenComponent implements OnInit, OnDestroy {
         }
 
         if (!isNullOrUndefined(this.indexOfLastIncorrectAnswer) && this.indexOfLastIncorrectAnswer + 1 === idx) {
+            return true;
+        }
+
+        if (isNullOrUndefined(answerModel) || answerModel.length == 0) {
             return true;
         }
 

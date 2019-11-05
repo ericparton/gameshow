@@ -14,7 +14,10 @@
       <div class="collapse navbar-collapse" [collapse]="isCollapsed">
         <ul class="nav navbar-nav">
           <li *ngIf="(isHost | async)" routerLinkActive="active">
-            <a routerLink="/game/host" (click)="isCollapsed=true">Control Console</a>
+            <a routerLink="/game/host" (click)="isCollapsed=true">Host Console</a>
+          </li>
+          <li *ngIf="(isHost | async)" routerLinkActive="active">
+            <a routerLink="/game/lighting" (click)="isCollapsed=true">Light Settings</a>
           </li>
           <li *ngIf="!(isHost | async)" routerLinkActive="active">
             <a routerLink="/game/player" (click)="isCollapsed=true">Buzzer</a>

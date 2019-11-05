@@ -1,0 +1,22 @@
+<div class="container below-fixed-navbar">
+    <h1>Light Settings</h1>
+    <hr/>
+    <div *ngFor="let alert of alerts">
+        <alert [type]="alert.type" [dismissible]="true" (onClosed)="onAlertClosed(alert)">{{ alert.msg }}</alert>
+    </div>
+    <form *ngIf="!showLoadMask" (ngSubmit)="onSubmit()" ngNativeValidate>
+        <div class="form-group">
+            <label>LIFX API Key:</label>
+            <input type="text" class="form-control" name="apiKey" [(ngModel)]="lightSettings.lifxApiKey" required>
+        </div>
+        <div class="form-group">
+            <label>LIFX Selector:</label>
+            <input type="text" class="form-control" name="selector" [(ngModel)]="lightSettings.lifxSelector" required>
+        </div>
+        <div class="checkbox">
+            <label><input type="checkbox" name="enabled" [(ngModel)]="lightSettings.enabled"> Enable lighting effects</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <div *ngIf="showLoadMask" class="spinner loading"></div>
+</div>

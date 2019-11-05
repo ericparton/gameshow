@@ -2,7 +2,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RouterModule, Routes} from "@angular/router";
-import {BsDropdownModule, ButtonsModule, CollapseModule, ModalModule} from "ngx-bootstrap";
+import {AlertModule, BsDropdownModule, ButtonsModule, CollapseModule, ModalModule} from "ngx-bootstrap";
 import {AppComponent} from "./app.component";
 import {HostScreenComponent} from "./host-screen/host-screen.component";
 import {PlayerScreenComponent} from "./player-screen/player-screen.component";
@@ -27,6 +27,10 @@ import {BsDatepickerModule} from 'ngx-bootstrap/datepicker';
 import {AuthorizationGuard} from "./shared/authorization.guard";
 import {WakeLockService} from "./shared/services/wake-lock.service";
 import {WakeLockGuard} from "./shared/wake-lock.guard";
+import {LightSettingsScreenComponent} from "./light-settings-screen/light-settings-screen.component";
+import {LightSettingsService} from "./shared/services/light-settings.service";
+import {LightService} from "./shared/services/light.service";
+import {HttpClientModule} from "@angular/common/http";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCekug-L053u-Rt0-6LeI4797JdFniFb7w",
@@ -57,6 +61,11 @@ const appRoutes: Routes = [
                 canActivate: [HostRouteGuard]
             },
             {
+                path: 'lighting',
+                component: LightSettingsScreenComponent,
+                canActivate: [HostRouteGuard]
+            },
+            {
                 path: 'player',
                 component: PlayerScreenComponent
             },
@@ -80,7 +89,8 @@ const appRoutes: Routes = [
         OrdinalPipe,
         TitleCasePipe,
         WelcomeScreenComponent,
-        GameScreenComponent
+        GameScreenComponent,
+        LightSettingsScreenComponent
     ],
     imports: [
         BrowserModule,
@@ -95,7 +105,9 @@ const appRoutes: Routes = [
         AngularFireDatabaseModule,
         AngularFireAuthModule,
         RouterModule.forRoot(appRoutes),
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
+        AlertModule.forRoot(),
+        HttpClientModule
     ],
     providers: [
         HostRouteGuard,
@@ -105,6 +117,8 @@ const appRoutes: Routes = [
         SubmissionService,
         UserService,
         GameService,
+        LightSettingsService,
+        LightService,
         WakeLockService,
         WakeLockGuard
     ],
