@@ -11,9 +11,9 @@ import {first} from "rxjs/operators";
 })
 export class LightSettingsScreenComponent implements OnInit {
 
-    private lightSettings: LightSettings = new LightSettings();
-    private showLoadMask: boolean = true;
-    private alerts: any[] = [];
+    public lightSettings: LightSettings = new LightSettings();
+    public showLoadMask: boolean = true;
+    public alerts: any[] = [];
 
     constructor(private lightSettingsService: LightSettingsService) {
     }
