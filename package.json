@@ -20,7 +20,7 @@
     "@angular/platform-server": "^8.2.14",
     "@angular/router": "^8.2.14",
     "firebase": "^6.3.3",
-    "moment": "^2.17.1",
+    "moment": "^2.29.2",
     "ngx-bootstrap": "^5.1.1",
     "nosleep.js": "^0.7.0",
     "rxjs": "^6.6.6",
